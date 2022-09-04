@@ -6,8 +6,7 @@ import TRACKINGS from "../data/trackings";
 export default function TrackingsScreen() {
   return (
     <View style={styles.rootContainer}>
-      <Title style={styles.title}>Your Trackings</Title>
-      <Text style={styles.helpText}>Swipe left to track it</Text>
+      <Text style={styles.helpText}>Swipe left to track</Text>
       <ScrollView style={styles.listContainer}>
         {TRACKINGS.map((tracking) => (
           <TrackingListItem
