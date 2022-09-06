@@ -14,25 +14,25 @@ const Drawer = createDrawerNavigator();
 
 function Root() {
   const preferencesContext = useContext(PreferencesContext);
-  const theme = preferencesContext.isThemeDark
-    ? DarkTheme
-    : DefaultTheme;
+  const theme = preferencesContext.isThemeDark ? DarkTheme : DefaultTheme;
 
   return (
-    <PaperProvider theme={theme.paper}>
-      <NavigationContainer theme={theme.navigation}>
-        <Drawer.Navigator drawerContent={() => <DrawerContent />}>
-          <Drawer.Screen name="Your Trackings" component={TrackingsScreen} />
-        </Drawer.Navigator>
-      </NavigationContainer>
-    </PaperProvider>
+    <>
+      <StatusBar style={preferencesContext.isThemeDark ? 'light' : 'dark'} />
+      <PaperProvider theme={theme.paper}>
+        <NavigationContainer theme={theme.navigation}>
+          <Drawer.Navigator drawerContent={() => <DrawerContent />}>
+            <Drawer.Screen name="Your Trackings" component={TrackingsScreen} />
+          </Drawer.Navigator>
+        </NavigationContainer>
+      </PaperProvider>
+    </>
   );
 }
 
 export default function App() {
   return (
     <>
-      <StatusBar style="auto" />
       <PreferencesContextProvider>
         <Root />
       </PreferencesContextProvider>

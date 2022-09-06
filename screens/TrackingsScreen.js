@@ -28,16 +28,12 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     alignItems: "center",
-    textAlign: "center",
     paddingTop: 20,
   },
   listContainer: {
     flex: 1,
     width: "100%",
     marginTop: 20,
-  },
-  title: {
-    marginBottom: 10,
   },
   helpText: {
     fontSize: 14,
