@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet } from "react-native"
+import { View, StyleSheet } from "react-native"
+import { Text } from "react-native-paper"
 
 export default function TrackingListItem({ name, lastOccurrence }) {
 	return (
@@ -12,10 +13,9 @@ export default function TrackingListItem({ name, lastOccurrence }) {
 const styles = StyleSheet.create({
 	rootContainer: {
 		flex: 1,
-		alignItems: "flex-start",
-		padding: 14,
-		borderBottomWidth: 1,
-		borderBottomColor: "#eee",
+		// alignItems: "flex-start",
+		paddingLeft: 14,
+		paddingBottom: 12,
 	},
 	name: {
 		fontSize: 18,
