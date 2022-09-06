@@ -1,39 +1,26 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View, Text, SafeAreaView } from "react-native";
 import TrackingsScreen from "./screens/TrackingsScreen";
 import { createDrawerNavigator } from "@react-navigation/drawer";
-import {
-  MD3LightTheme as DefaultTheme,
-  Provider as PaperProvider,
-  DarkTheme as PaperDarkTheme,
-  DefaultTheme as PaperDefaultTheme,
-} from "react-native-paper";
-import {
-  NavigationContainer,
-  DarkTheme as NavigationDarkTheme,
-  DefaultTheme as NavigationDefaultTheme,
-} from "@react-navigation/native";
-import merge from "deepmerge";
+import { Provider as PaperProvider } from "react-native-paper";
+import { NavigationContainer } from "@react-navigation/native";
 import DrawerContent from "./components/drawer/Content";
 import PreferencesContextProvider, {
   PreferencesContext,
 } from "./store/context/preferences-context";
 import { useContext } from "react";
-
-const CombinedDefaultTheme = merge(PaperDefaultTheme, NavigationDefaultTheme);
-const CombinedDarkTheme = merge(PaperDarkTheme, NavigationDarkTheme);
+import { DefaultTheme, DarkTheme } from "./config/themes";
 
 const Drawer = createDrawerNavigator();
 
 function Root() {
   const preferencesContext = useContext(PreferencesContext);
   const theme = preferencesContext.isThemeDark
-    ? CombinedDarkTheme
-    : CombinedDefaultTheme;
+    ? DarkTheme
+    : DefaultTheme;
 
   return (
-    <PaperProvider theme={theme}>
-      <NavigationContainer theme={theme}>
+    <PaperProvider theme={theme.paper}>
+      <NavigationContainer theme={theme.navigation}>
         <Drawer.Navigator drawerContent={() => <DrawerContent />}>
           <Drawer.Screen name="Your Trackings" component={TrackingsScreen} />
         </Drawer.Navigator>
@@ -52,13 +39,3 @@ export default function App() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    width: "100%",
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
