@@ -13,7 +13,6 @@ export default function TrackingListItem({ name, lastOccurrence }) {
 const styles = StyleSheet.create({
 	rootContainer: {
 		flex: 1,
-		// alignItems: "flex-start",
 		paddingLeft: 14,
 		paddingBottom: 12,
 	},
