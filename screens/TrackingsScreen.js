@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View, ScrollView } from "react-native";
+import { StyleSheet, View, ScrollView } from "react-native";
+import { Text } from 'react-native-paper';
 import Title from "../components/Title";
 import TrackingListItem from "../components/TrackingListItem";
 import TRACKINGS from "../data/trackings";
