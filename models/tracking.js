@@ -7,6 +7,11 @@ export default class TrackingModel {
 		this.occurrences = occurrences?.map(ocr => new OccurrenceModel(ocr))
 	}
 
+	track() {
+		const currentOccurrences = this.occurrences || []
+		this.occurrences = [new OccurrenceModel({ id: Date.now(), time: new Date() }), ...currentOccurrences]
+	}
+
 	lastOccurrence() {
 		return this.occurrences?.[0]
 	}

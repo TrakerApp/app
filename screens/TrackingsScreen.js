@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { StyleSheet, SafeAreaView, FlatList, View } from "react-native";
 import { Text, Divider } from "react-native-paper";
 import TrackingListItem from "../components/TrackingListItem";
@@ -12,19 +12,18 @@ function swipeableRightActions(progress, dragX) {
   //   outputRange: [-20, 0, 0, 1],
   // });
   return (
-    // TODO: Theme based background coloring
     <View style={styles.swipeableActionsContainer}>
       <Text style={{}}>TRACK</Text>
     </View>
   );
 }
 
-function TrackingListItemSwipeable({ item }) {
+function TrackingListItemSwipeable({ onSwipeRight, item }) {
   const swipeableRef = useRef(null);
 
   const handleSwipe = (direction) => {
     if (direction === 'right') {
-      console.log("TRACK ME!")
+      onSwipeRight(item)
       swipeableRef.current.close()
     }
   }
@@ -40,16 +39,21 @@ function TrackingListItemSwipeable({ item }) {
 }
 
 export default function TrackingsScreen() {
-  const data = TRACKINGS.map(tracking => new TrackingModel(tracking))
+  const [trackings, setTrackings] = useState(TRACKINGS.map(t => new TrackingModel(t)))
+
+  const handleTracking = (tracking) => {
+    tracking.track()
+    setTrackings([...trackings])
+  }
 
   return (
     <SafeAreaView style={styles.rootContainer}>
       <Text style={styles.helpText}>Swipe left to track</Text>
       <FlatList
         style={styles.listContainer}
-        data={data}
+        data={trackings}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <TrackingListItemSwipeable item={item} />}
+        renderItem={({ item }) => <TrackingListItemSwipeable onSwipeRight={handleTracking} item={item} />}
         ItemSeparatorComponent={() => <Divider />}
       />
     </SafeAreaView>
