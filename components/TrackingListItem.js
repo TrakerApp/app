@@ -15,6 +15,11 @@ const styles = StyleSheet.create({
 		flex: 1,
 		paddingLeft: 14,
 		paddingBottom: 12,
+		justifyContent: 'center',
+		minHeight: 50,
+		backgroundColor: '#f2f2f2',
+		borderRightColor: '#c8c8c8',
+		borderRightWidth: 1,
 	},
 	name: {
 		fontSize: 18,
