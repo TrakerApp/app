@@ -1,9 +1,9 @@
-import { useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from "react";
 import { StyleSheet, SafeAreaView, FlatList, View } from "react-native";
-import { Text, Divider } from "react-native-paper";
+import { IconButton, Text, Divider } from "react-native-paper";
 import TrackingListItem from "../components/TrackingListItem";
 import TRACKINGS from "../data/trackings";
-import TrackingModel from '../models/tracking';
+import TrackingModel from "../models/tracking";
 import { Swipeable } from "react-native-gesture-handler";
 
 function swipeableRightActions(progress, dragX) {
@@ -22,14 +22,20 @@ function TrackingListItemSwipeable({ onSwipeRight, item }) {
   const swipeableRef = useRef(null);
 
   const handleSwipe = (direction) => {
-    if (direction === 'right') {
-      onSwipeRight(item)
-      swipeableRef.current.close()
+    if (direction === "right") {
+      onSwipeRight(item);
+      swipeableRef.current.close();
     }
-  }
+  };
 
   return (
-    <Swipeable ref={swipeableRef} renderRightActions={swipeableRightActions} leftThreshold={100} rightThreshold={100} onSwipeableOpen={handleSwipe}>
+    <Swipeable
+      ref={swipeableRef}
+      renderRightActions={swipeableRightActions}
+      leftThreshold={100}
+      rightThreshold={100}
+      onSwipeableOpen={handleSwipe}
+    >
       <TrackingListItem
         name={item.name}
         lastOccurrenceTime={item.lastOccurrenceTime()}
@@ -38,13 +44,29 @@ function TrackingListItemSwipeable({ onSwipeRight, item }) {
   );
 }
 
-export default function TrackingsScreen() {
-  const [trackings, setTrackings] = useState(TRACKINGS.map(t => new TrackingModel(t)))
+export default function TrackingsScreen({ navigation }) {
+  // useMemo() to fetch from API
+  const [trackings, setTrackings] = useState(
+    TRACKINGS.map((t) => new TrackingModel(t))
+  );
+
+  const handleAddNewTracking = () => {
+    // show modal
+    console.log("add new tracking!");
+  };
+
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <IconButton icon="plus" onPress={handleAddNewTracking} />
+      ),
+    });
+  }, [navigation]);
 
   const handleTracking = (tracking) => {
-    tracking.track()
-    setTrackings([...trackings])
-  }
+    tracking.track();
+    setTrackings([...trackings]);
+  };
 
   return (
     <SafeAreaView style={styles.rootContainer}>
@@ -53,7 +75,12 @@ export default function TrackingsScreen() {
         style={styles.listContainer}
         data={trackings}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <TrackingListItemSwipeable onSwipeRight={handleTracking} item={item} />}
+        renderItem={({ item }) => (
+          <TrackingListItemSwipeable
+            onSwipeRight={handleTracking}
+            item={item}
+          />
+        )}
         ItemSeparatorComponent={() => <Divider />}
       />
     </SafeAreaView>
