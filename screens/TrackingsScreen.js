@@ -3,6 +3,7 @@ import { StyleSheet, SafeAreaView, FlatList, View } from "react-native";
 import { Text, Divider } from "react-native-paper";
 import TrackingListItem from "../components/TrackingListItem";
 import TRACKINGS from "../data/trackings";
+import TrackingModel from '../models/tracking';
 import { Swipeable } from "react-native-gesture-handler";
 
 function swipeableRightActions(progress, dragX) {
@@ -32,19 +33,21 @@ function TrackingListItemSwipeable({ item }) {
     <Swipeable ref={swipeableRef} renderRightActions={swipeableRightActions} leftThreshold={100} rightThreshold={100} onSwipeableOpen={handleSwipe}>
       <TrackingListItem
         name={item.name}
-        lastOccurrence={item.occurrences?.[0]?.time}
+        lastOccurrenceTime={item.lastOccurrenceTime()}
       />
     </Swipeable>
   );
 }
 
 export default function TrackingsScreen() {
+  const data = TRACKINGS.map(tracking => new TrackingModel(tracking))
+
   return (
     <SafeAreaView style={styles.rootContainer}>
       <Text style={styles.helpText}>Swipe left to track</Text>
       <FlatList
         style={styles.listContainer}
-        data={TRACKINGS}
+        data={data}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <TrackingListItemSwipeable item={item} />}
         ItemSeparatorComponent={() => <Divider />}
