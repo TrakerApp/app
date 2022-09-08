@@ -1,10 +1,18 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { StyleSheet, SafeAreaView, FlatList, View } from "react-native";
-import { IconButton, Text, Divider } from "react-native-paper";
+import {
+  IconButton,
+  Text,
+  Divider,
+  Modal,
+  Portal,
+  Snackbar,
+} from "react-native-paper";
 import TrackingListItem from "../components/TrackingListItem";
 import TRACKINGS from "../data/trackings";
 import TrackingModel from "../models/tracking";
 import { Swipeable } from "react-native-gesture-handler";
+import NewTrackingForm from "../components/NewTrackingForm";
 
 function swipeableRightActions(progress, dragX) {
   // const trans = dragX.interpolate({
@@ -46,13 +54,41 @@ function TrackingListItemSwipeable({ onSwipeRight, item }) {
 
 export default function TrackingsScreen({ navigation }) {
   // useMemo() to fetch from API
+  const [trackingModalVisible, setTrackingModalVisible] = useState(false);
+  const [snackbarVisible, setSnackbarVisible] = useState(false);
   const [trackings, setTrackings] = useState(
     TRACKINGS.map((t) => new TrackingModel(t))
   );
+  const showModal = () => {
+    setTrackingModalVisible(true);
+  };
+  const hideModal = () => {
+    setTrackingModalVisible(false);
+  };
+  const showSnackbar = () => {
+    setSnackbarVisible(true);
+  };
+  const hideSnackbar = () => {
+    setSnackbarVisible(false);
+  };
 
   const handleAddNewTracking = () => {
     // show modal
-    console.log("add new tracking!");
+    showModal();
+  };
+
+  const handleCreateTracking = (name) => {
+    // create tracking
+    const newTracking = new TrackingModel({ name, id: Math.random().toString(), occurrences: [] });
+    setTrackings((currentTrackings) => [newTracking, ...currentTrackings]);
+    // hide modal
+    hideModal();
+    showSnackbar();
+  };
+
+  const handleTracking = (tracking) => {
+    tracking.track();
+    setTrackings([...trackings]);
   };
 
   useLayoutEffect(() => {
@@ -63,13 +99,13 @@ export default function TrackingsScreen({ navigation }) {
     });
   }, [navigation]);
 
-  const handleTracking = (tracking) => {
-    tracking.track();
-    setTrackings([...trackings]);
-  };
-
   return (
     <SafeAreaView style={styles.rootContainer}>
+      <Portal>
+        <Modal visible={trackingModalVisible} onDismiss={hideModal}>
+          <NewTrackingForm onCreate={handleCreateTracking} onCancel={hideModal} />
+        </Modal>
+      </Portal>
       <Text style={styles.helpText}>Swipe left to track</Text>
       <FlatList
         style={styles.listContainer}
@@ -83,6 +119,17 @@ export default function TrackingsScreen({ navigation }) {
         )}
         ItemSeparatorComponent={() => <Divider />}
       />
+      <Snackbar
+        visible={snackbarVisible}
+        onDismiss={hideSnackbar}
+        duration={3000}
+        action={{
+          label: "Ok",
+          onPress: hideSnackbar,
+        }}
+      >
+        Tracking added
+      </Snackbar>
     </SafeAreaView>
   );
 }
