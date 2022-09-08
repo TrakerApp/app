@@ -9,7 +9,6 @@ import {
   Snackbar,
 } from "react-native-paper";
 import TrackingListItem from "../components/TrackingListItem";
-import TRACKINGS from "../data/trackings";
 import TrackingModel from "../models/tracking";
 import { Swipeable } from "react-native-gesture-handler";
 import NewTrackingForm from "../components/NewTrackingForm";
@@ -57,9 +56,8 @@ export default function TrackingsScreen({ navigation }) {
   // useMemo() to fetch from API
   const [trackingModalVisible, setTrackingModalVisible] = useState(false);
   const [snackbarVisible, setSnackbarVisible] = useState(false);
-  const [trackings, setTrackings] = useState(
-    TRACKINGS.map((t) => new TrackingModel(t))
-  );
+  const [trackings, setTrackings] = useState(TrackingModel.all());
+
   const showModal = () => {
     setTrackingModalVisible(true);
   };
@@ -80,7 +78,11 @@ export default function TrackingsScreen({ navigation }) {
 
   const handleCreateTracking = (name) => {
     // create tracking
-    const newTracking = new TrackingModel({ name, id: Math.random().toString(), occurrences: [] });
+    const newTracking = new TrackingModel({
+      name,
+      id: Math.random().toString(),
+      occurrences: [],
+    });
     setTrackings((currentTrackings) => [newTracking, ...currentTrackings]);
     // hide modal
     hideModal();
@@ -104,7 +106,10 @@ export default function TrackingsScreen({ navigation }) {
     <SafeAreaView style={styles.rootContainer}>
       <Portal>
         <Modal visible={trackingModalVisible} onDismiss={hideModal}>
-          <NewTrackingForm onCreate={handleCreateTracking} onCancel={hideModal} />
+          <NewTrackingForm
+            onCreate={handleCreateTracking}
+            onCancel={hideModal}
+          />
         </Modal>
       </Portal>
       <Text style={styles.helpText}>Swipe left to track</Text>

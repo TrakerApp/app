@@ -1,10 +1,18 @@
 import OccurrenceModel from "./occurrence"
-
+import TRACKINGS from "../data/trackings"
 export default class TrackingModel {
 	constructor({ id, name, occurrences }) {
 		this.id = id
 		this.name = name
 		this.occurrences = occurrences?.map(ocr => new OccurrenceModel(ocr))
+	}
+
+	static all() {
+		return TRACKINGS.map((t) => new TrackingModel(t))
+	}
+
+	static find(id) {
+		return this.all().find((t) => t.id === id)
 	}
 
 	track() {
