@@ -9,6 +9,7 @@ import PreferencesContextProvider, {
 } from "./store/context/preferences-context";
 import { useContext } from "react";
 import { DefaultTheme, DarkTheme } from "./config/themes";
+import TrackingScreen from "./screens/TrackingScreen";
 
 const Drawer = createDrawerNavigator();
 
@@ -18,11 +19,12 @@ function Root() {
 
   return (
     <>
-      <StatusBar style={preferencesContext.isThemeDark ? 'light' : 'dark'} />
+      <StatusBar style={preferencesContext.isThemeDark ? "light" : "dark"} />
       <PaperProvider theme={theme.paper}>
         <NavigationContainer theme={theme.navigation}>
           <Drawer.Navigator drawerContent={() => <DrawerContent />}>
             <Drawer.Screen name="Your Trackings" component={TrackingsScreen} />
+            <Drawer.Screen name="Tracking" component={TrackingScreen} />
           </Drawer.Navigator>
         </NavigationContainer>
       </PaperProvider>

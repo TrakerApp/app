@@ -45,6 +45,7 @@ function TrackingListItemSwipeable({ onSwipeRight, item }) {
       onSwipeableOpen={handleSwipe}
     >
       <TrackingListItem
+        id={item.id}
         name={item.name}
         lastOccurrenceTime={item.lastOccurrenceTime()}
       />
