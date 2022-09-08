@@ -33,6 +33,7 @@ export default function NewTrackingForm({ onCreate, onCancel }) {
       <Text style={styles.title}>Add new tracking</Text>
       <TextInput
 				mode="outlined"
+				error={nameHasError}
         label="Name"
         value={name}
         placeholder="Drink Water"
