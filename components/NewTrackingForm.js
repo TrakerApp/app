@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text, TextInput, Button, HelperText } from "react-native-paper";
+import useColors from "../util/hooks/useColors";
 
 export default function NewTrackingForm({ onCreate, onCancel }) {
   const [name, setName] = useState("");
 	const [nameHasError, setNameHasError] = useState(false);
+	const colors = useColors()
 
   const handleCreate = () => {
     if (name !== "") {
@@ -29,7 +31,7 @@ export default function NewTrackingForm({ onCreate, onCancel }) {
 	}
 
   return (
-    <View style={styles.rootContainer}>
+    <View style={[styles.rootContainer, { backgroundColor: colors.modalBackground }]}>
       <Text style={styles.title}>Add new tracking</Text>
       <TextInput
 				mode="outlined"
@@ -59,8 +61,6 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     paddingHorizontal: 20,
     width: "100%",
-    backgroundColor: "white", // good for light
-    // backgroundColor: '#333', // good for dark
   },
   buttonsContainer: {
     marginTop: 20,
