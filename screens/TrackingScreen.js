@@ -1,13 +1,14 @@
-import { useContext, useEffect, useLayoutEffect, useMemo, useState } from "react";
+import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { Button, IconButton, Text } from "react-native-paper";
-import TrackingModel from "../models/tracking";
+import { Button, IconButton, Text, Portal, Modal } from "react-native-paper";
 import { TrackingsContext } from "../store/context/trackings-context";
 import useColors from "../util/hooks/useColors";
+import TrackingForm from "../components/TrackingForm";
 
 export default function TrackingScreen({ navigation, route }) {
-  const trackingsCtx = useContext(TrackingsContext)
+  const trackingsCtx = useContext(TrackingsContext);
   const [tracking, setTracking] = useState(null);
+  const [editModalVisible, setEditModalVisible] = useState(false);
   const colors = useColors();
   const { id } = route.params;
 
@@ -29,25 +30,50 @@ export default function TrackingScreen({ navigation, route }) {
     const fetchTracking = async () => {
       const tracking = await trackingsCtx.findTracking(id);
       setTracking(tracking);
-    }
+    };
 
     fetchTracking();
   }, [id]);
 
   if (!tracking) {
-    return <Text>Loading...</Text>
+    return <Text>Loading...</Text>;
+  }
+
+  const handleTrack = () => {
+    console.log("handling tracking!");
+    trackingsCtx.track(tracking);
+  };
+
+  const showModal = () => setEditModalVisible(true);
+  const hideModal = () => setEditModalVisible(false);
+
+  const handleSaveName = (name) => {
+    console.log("new name: ", name)
+    trackingsCtx.editTracking({ id, name });
+    hideModal()
   }
 
   const hasOccurrences = tracking.occurrences?.length > 0;
 
   return (
     <View style={styles.rootContainer}>
+      <Portal>
+        <Modal visible={editModalVisible} onDismiss={hideModal}>
+          <TrackingForm
+            defaultValues={{ name: tracking.name }}
+            isEditing={editModalVisible}
+            onSave={handleSaveName}
+            onCancel={hideModal}
+          />
+        </Modal>
+      </Portal>
+
       <Text style={styles.title}>{tracking.name}</Text>
       <View style={styles.buttonsContainer}>
-        <Button style={styles.button} mode="outlined">
+        <Button style={styles.button} mode="outlined" onPress={showModal}>
           Edit
         </Button>
-        <Button style={styles.button} mode="outlined">
+        <Button style={styles.button} mode="outlined" onPress={handleTrack}>
           Track
         </Button>
       </View>
@@ -60,9 +86,12 @@ export default function TrackingScreen({ navigation, route }) {
         <Text style={[styles.helpText, { color: colors.helpText }]}>
           Swipe left to remove an occurrence
         </Text>
-        {hasOccurrences && tracking.occurrences.map((occurrence) => (
-          <Text key={occurrence.id} style={styles.occurrence}>{occurrence.time.toString()}</Text>
-        ))}
+        {hasOccurrences &&
+          tracking.occurrences.map((occurrence) => (
+            <Text key={occurrence.id} style={styles.occurrence}>
+              {occurrence.time.toString()}
+            </Text>
+          ))}
         {!hasOccurrences && (
           <Text style={[styles.helpText, { color: colors.helpText }]}>
             No occurrences yet
@@ -111,7 +140,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 5,
   },
-	occurrence: {
-		paddingVertical: 6,
-	},
+  occurrence: {
+    paddingVertical: 6,
+  },
 });

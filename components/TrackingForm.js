@@ -3,8 +3,8 @@ import { StyleSheet, View } from "react-native";
 import { Text, TextInput, Button, HelperText } from "react-native-paper";
 import useColors from "../util/hooks/useColors";
 
-export default function NewTrackingForm({ isEditing, onCreate, onCancel }) {
-  const [name, setName] = useState("");
+export default function TrackingForm({ isEditing, onSave, onCancel, defaultValues = {} }) {
+  const [name, setName] = useState(defaultValues?.name || "");
   const [nameHasError, setNameHasError] = useState(false);
   const nameInputRef = useRef(null);
   const colors = useColors();
@@ -12,7 +12,7 @@ export default function NewTrackingForm({ isEditing, onCreate, onCancel }) {
   const handleCreate = () => {
     if (name !== "") {
       setNameHasError(false);
-      onCreate(name);
+      onSave(name);
       setName("");
     } else {
       setNameHasError(true);

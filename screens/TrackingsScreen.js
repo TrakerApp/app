@@ -9,9 +9,8 @@ import {
   Snackbar,
 } from "react-native-paper";
 import TrackingListItem from "../components/TrackingListItem";
-import TrackingModel from "../models/tracking";
 import { Swipeable } from "react-native-gesture-handler";
-import NewTrackingForm from "../components/NewTrackingForm";
+import TrackingForm from "../components/TrackingForm";
 import { TrackingsContext } from "../store/context/trackings-context";
 
 function swipeableRightActions(progress, dragX) {
@@ -102,13 +101,15 @@ export default function TrackingsScreen({ navigation }) {
     });
   }, [navigation]);
 
+  console.log("rendering trackings:", trackingsCtx.trackings)
+
   return (
     <SafeAreaView style={styles.rootContainer}>
       <Portal>
         <Modal visible={trackingModalVisible} onDismiss={hideModal}>
-          <NewTrackingForm
+          <TrackingForm
             isEditing={trackingModalVisible}
-            onCreate={handleCreateTracking}
+            onSave={handleCreateTracking}
             onCancel={hideModal}
           />
         </Modal>
