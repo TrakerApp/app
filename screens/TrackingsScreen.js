@@ -108,7 +108,7 @@ export default function TrackingsScreen({ navigation }) {
       <Portal>
         <Modal visible={trackingModalVisible} onDismiss={hideModal}>
           <TrackingForm
-            isEditing={trackingModalVisible}
+            focusInput={trackingModalVisible}
             onSave={handleCreateTracking}
             onCancel={hideModal}
           />

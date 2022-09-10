@@ -61,9 +61,11 @@ export default function TrackingScreen({ navigation, route }) {
         <Modal visible={editModalVisible} onDismiss={hideModal}>
           <TrackingForm
             defaultValues={{ name: tracking.name }}
-            isEditing={editModalVisible}
+            focusInput={editModalVisible}
             onSave={handleSaveName}
             onCancel={hideModal}
+            showHelp={false}
+            buttonLabel="Save"
           />
         </Modal>
       </Portal>
