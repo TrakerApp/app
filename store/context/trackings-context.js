@@ -1,5 +1,5 @@
 import { createContext, useState } from "react";
-import TrackingModel from "../../models/tracking";
+import TrackingModel from "../../models/tracking.model";
 
 export const TrackingsContext = createContext({
   trackings: [],

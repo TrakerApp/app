@@ -1,4 +1,4 @@
-import OccurrenceModel from "./occurrence"
+import OccurrenceModel from "./occurrence.model"
 import TRACKINGS from "../data/trackings"
 export default class TrackingModel {
 	constructor({ id, name, occurrences }) {
