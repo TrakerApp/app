@@ -48,8 +48,8 @@ export default function TrackingScreen({ navigation, route }) {
 
   const handleSaveName = ({ name }) => {
     trackingsCtx.editTracking({ id, name });
-    hideModal()
-  }
+    hideModal();
+  };
 
   const hasOccurrences = tracking.occurrences?.length > 0;
 
@@ -77,10 +77,11 @@ export default function TrackingScreen({ navigation, route }) {
           Track
         </Button>
       </View>
+      {/* TODO: Make this work
       <View style={styles.infoContainer}>
         <Text style={styles.info}>Today: 1 time</Text>
         <Text style={styles.info}>This week: 3 times</Text>
-      </View>
+      </View> */}
       <View style={styles.historyContainer}>
         <Text style={styles.subtitle}>History</Text>
         <Text style={[styles.helpText, { color: colors.helpText }]}>

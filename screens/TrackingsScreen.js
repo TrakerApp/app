@@ -1,4 +1,10 @@
-import { useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { StyleSheet, SafeAreaView, FlatList, View } from "react-native";
 import {
   IconButton,
@@ -56,11 +62,11 @@ export default function TrackingsScreen({ navigation }) {
   // useMemo() to fetch from API
   const [trackingModalVisible, setTrackingModalVisible] = useState(false);
   const [snackbarVisible, setSnackbarVisible] = useState(false);
-  const trackingsCtx = useContext(TrackingsContext)
+  const trackingsCtx = useContext(TrackingsContext);
 
   useEffect(() => {
     trackingsCtx.fetchTrackings();
-  }, [])
+  }, []);
 
   const showModal = () => {
     setTrackingModalVisible(true);
