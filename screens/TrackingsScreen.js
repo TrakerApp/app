@@ -59,7 +59,6 @@ export default function TrackingsScreen({ navigation }) {
   const trackingsCtx = useContext(TrackingsContext)
 
   useEffect(() => {
-    console.log("on useEffect")
     trackingsCtx.fetchTrackings();
   }, [])
 
@@ -81,9 +80,9 @@ export default function TrackingsScreen({ navigation }) {
     showModal();
   };
 
-  const handleCreateTracking = (name) => {
+  const handleCreateTracking = (tracking) => {
     // create tracking
-    trackingsCtx.addTracking({ name });
+    trackingsCtx.addTracking(tracking);
     // hide modal
     hideModal();
     showSnackbar();
@@ -100,8 +99,6 @@ export default function TrackingsScreen({ navigation }) {
       ),
     });
   }, [navigation]);
-
-  console.log("rendering trackings:", trackingsCtx.trackings)
 
   return (
     <SafeAreaView style={styles.rootContainer}>

@@ -3,6 +3,8 @@ import { StyleSheet, View } from "react-native";
 import { Text, TextInput, Button, HelperText } from "react-native-paper";
 import useColors from "../util/hooks/useColors";
 
+const blankForm = { name: "" };
+
 export default function TrackingForm({
   focusInput,
   onSave,
@@ -11,16 +13,18 @@ export default function TrackingForm({
   buttonLabel = "Create",
   showHelp = true,
 }) {
-  const [name, setName] = useState(defaultValues?.name || "");
+  const [form, setForm] = useState({ ...blankForm, ...defaultValues });
   const [nameHasError, setNameHasError] = useState(false);
   const nameInputRef = useRef(null);
   const colors = useColors();
 
   const handleCreate = () => {
-    if (name !== "") {
+    if (form.name !== "") {
       setNameHasError(false);
-      onSave(name);
-      setName("");
+      onSave(form);
+      setForm((currentValues) => {
+        return { ...currentValues, ...blankForm };
+      });
     } else {
       setNameHasError(true);
     }
@@ -30,10 +34,15 @@ export default function TrackingForm({
     onCancel();
   };
 
-  const handleTextInput = (text) => {
-    setName(text);
+  const handleTextInput = (inputId, inputValue) => {
+    setForm((currentForm) => {
+      return {
+        ...currentForm,
+        [inputId]: inputValue,
+      };
+    });
 
-    if (text !== "") {
+    if (inputValue !== "") {
       setNameHasError(false);
     }
   };
@@ -57,9 +66,9 @@ export default function TrackingForm({
         mode="outlined"
         error={nameHasError}
         label="Name"
-        value={name}
+        value={form.name}
         placeholder="Drink Water"
-        onChangeText={handleTextInput}
+        onChangeText={handleTextInput.bind(this, "name")}
       />
       {nameHasError && (
         <HelperText type="error" visible={nameHasError}>

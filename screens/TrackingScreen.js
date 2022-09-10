@@ -40,15 +40,13 @@ export default function TrackingScreen({ navigation, route }) {
   }
 
   const handleTrack = () => {
-    console.log("handling tracking!");
     trackingsCtx.track(tracking);
   };
 
   const showModal = () => setEditModalVisible(true);
   const hideModal = () => setEditModalVisible(false);
 
-  const handleSaveName = (name) => {
-    console.log("new name: ", name)
+  const handleSaveName = ({ name }) => {
     trackingsCtx.editTracking({ id, name });
     hideModal()
   }
