@@ -10,6 +10,7 @@ import PreferencesContextProvider, {
 import { useContext } from "react";
 import { DefaultTheme, DarkTheme } from "./config/themes";
 import TrackingScreen from "./screens/TrackingScreen";
+import TrackingsContextProvider from "./store/context/trackings-context";
 
 const Drawer = createDrawerNavigator();
 
@@ -36,7 +37,9 @@ export default function App() {
   return (
     <>
       <PreferencesContextProvider>
-        <Root />
+        <TrackingsContextProvider>
+          <Root />
+        </TrackingsContextProvider>
       </PreferencesContextProvider>
     </>
   );

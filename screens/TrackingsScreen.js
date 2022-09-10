@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useContext, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { StyleSheet, SafeAreaView, FlatList, View } from "react-native";
 import {
   IconButton,
@@ -12,6 +12,7 @@ import TrackingListItem from "../components/TrackingListItem";
 import TrackingModel from "../models/tracking";
 import { Swipeable } from "react-native-gesture-handler";
 import NewTrackingForm from "../components/NewTrackingForm";
+import { TrackingsContext } from "../store/context/trackings-context";
 
 function swipeableRightActions(progress, dragX) {
   // const trans = dragX.interpolate({
@@ -56,7 +57,12 @@ export default function TrackingsScreen({ navigation }) {
   // useMemo() to fetch from API
   const [trackingModalVisible, setTrackingModalVisible] = useState(false);
   const [snackbarVisible, setSnackbarVisible] = useState(false);
-  const [trackings, setTrackings] = useState(TrackingModel.all());
+  const trackingsCtx = useContext(TrackingsContext)
+
+  useEffect(() => {
+    console.log("on useEffect")
+    trackingsCtx.fetchTrackings();
+  }, [])
 
   const showModal = () => {
     setTrackingModalVisible(true);
@@ -78,20 +84,14 @@ export default function TrackingsScreen({ navigation }) {
 
   const handleCreateTracking = (name) => {
     // create tracking
-    const newTracking = new TrackingModel({
-      name,
-      id: Math.random().toString(),
-      occurrences: [],
-    });
-    setTrackings((currentTrackings) => [newTracking, ...currentTrackings]);
+    trackingsCtx.addTracking({ name });
     // hide modal
     hideModal();
     showSnackbar();
   };
 
   const handleTracking = (tracking) => {
-    tracking.track();
-    setTrackings([...trackings]);
+    trackingsCtx.track({ id: tracking.id });
   };
 
   useLayoutEffect(() => {
@@ -116,7 +116,7 @@ export default function TrackingsScreen({ navigation }) {
       <Text style={styles.helpText}>Swipe left to track</Text>
       <FlatList
         style={styles.listContainer}
-        data={trackings}
+        data={trackingsCtx.trackings}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <TrackingListItemSwipeable

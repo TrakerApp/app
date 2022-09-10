@@ -1,17 +1,15 @@
-import { useLayoutEffect, useMemo } from "react";
+import { useContext, useEffect, useLayoutEffect, useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { Button, IconButton, Text } from "react-native-paper";
 import TrackingModel from "../models/tracking";
+import { TrackingsContext } from "../store/context/trackings-context";
 import useColors from "../util/hooks/useColors";
 
 export default function TrackingScreen({ navigation, route }) {
+  const trackingsCtx = useContext(TrackingsContext)
+  const [tracking, setTracking] = useState(null);
   const colors = useColors();
   const { id } = route.params;
-  const tracking = useMemo(() => {
-    return TrackingModel.find(id);
-  }, [id]);
-
-  const hasOccurrences = tracking.occurrences?.length > 0;
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -26,6 +24,21 @@ export default function TrackingScreen({ navigation, route }) {
       ),
     });
   }, [navigation]);
+
+  useEffect(() => {
+    const fetchTracking = async () => {
+      const tracking = await trackingsCtx.findTracking(id);
+      setTracking(tracking);
+    }
+
+    fetchTracking();
+  }, [id]);
+
+  if (!tracking) {
+    return <Text>Loading...</Text>
+  }
+
+  const hasOccurrences = tracking.occurrences?.length > 0;
 
   return (
     <View style={styles.rootContainer}>
