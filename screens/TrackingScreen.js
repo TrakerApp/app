@@ -11,6 +11,8 @@ export default function TrackingScreen({ navigation, route }) {
     return TrackingModel.find(id);
   }, [id]);
 
+  const hasOccurrences = tracking.occurrences?.length > 0;
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerLeft: () => (
@@ -45,9 +47,14 @@ export default function TrackingScreen({ navigation, route }) {
         <Text style={[styles.helpText, { color: colors.helpText }]}>
           Swipe left to remove an occurrence
         </Text>
-        {tracking.occurrences.map((occurrence) => (
+        {hasOccurrences && tracking.occurrences.map((occurrence) => (
           <Text key={occurrence.id} style={styles.occurrence}>{occurrence.time.toString()}</Text>
         ))}
+        {!hasOccurrences && (
+          <Text style={[styles.helpText, { color: colors.helpText }]}>
+            No occurrences yet
+          </Text>
+        )}
       </View>
     </View>
   );
