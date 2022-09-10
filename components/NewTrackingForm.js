@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text, TextInput, Button, HelperText } from "react-native-paper";
 import useColors from "../util/hooks/useColors";
 
-export default function NewTrackingForm({ onCreate, onCancel }) {
+export default function NewTrackingForm({ isEditing, onCreate, onCancel }) {
   const [name, setName] = useState("");
 	const [nameHasError, setNameHasError] = useState(false);
+  const nameInputRef = useRef(null);
 	const colors = useColors()
 
   const handleCreate = () => {
@@ -30,10 +31,17 @@ export default function NewTrackingForm({ onCreate, onCancel }) {
 		}
 	}
 
+  useEffect(() => {
+    if (isEditing) {
+      nameInputRef.current.focus();
+    }
+  }, [isEditing]);
+
   return (
     <View style={[styles.rootContainer, { backgroundColor: colors.modalBackground }]}>
       <Text style={styles.title}>Add new tracking</Text>
       <TextInput
+        ref={nameInputRef}
 				mode="outlined"
 				error={nameHasError}
         label="Name"
