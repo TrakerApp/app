@@ -1,32 +1,35 @@
 import { StatusBar } from "expo-status-bar";
-import TrackingsScreen from "./screens/TrackingsScreen";
-import { createDrawerNavigator } from "@react-navigation/drawer";
 import { Provider as PaperProvider } from "react-native-paper";
 import { NavigationContainer } from "@react-navigation/native";
-import DrawerContent from "./components/drawer/Content";
 import PreferencesContextProvider, {
   PreferencesContext,
 } from "./store/context/preferences-context";
 import { useContext } from "react";
 import { DefaultTheme, DarkTheme } from "./config/themes";
-import TrackingScreen from "./screens/TrackingScreen";
 import TrackingsContextProvider from "./store/context/trackings-context";
-
-const Drawer = createDrawerNavigator();
+import AuthContextProvider, { AuthContext } from "./store/context/auth-context";
+import AuthenticatedNavigator from "./navigation/AuthenticatedNavigator";
+import UnauthenticatedNavigator from "./navigation/UnauthenticatedNavigator";
 
 function Root() {
   const preferencesContext = useContext(PreferencesContext);
+  const authContext = useContext(AuthContext);
   const theme = preferencesContext.isThemeDark ? DarkTheme : DefaultTheme;
+  console.log(
+    "here authContext.isAuthenticated is",
+    authContext.isAuthenticated
+  );
 
   return (
     <>
       <StatusBar style={preferencesContext.isThemeDark ? "light" : "dark"} />
       <PaperProvider theme={theme.paper}>
         <NavigationContainer theme={theme.navigation}>
-          <Drawer.Navigator drawerContent={() => <DrawerContent />}>
-            <Drawer.Screen name="Your Trackings" component={TrackingsScreen} />
-            <Drawer.Screen name="Tracking" component={TrackingScreen} />
-          </Drawer.Navigator>
+          {authContext.isAuthenticated ? (
+            <AuthenticatedNavigator />
+          ) : (
+            <UnauthenticatedNavigator />
+          )}
         </NavigationContainer>
       </PaperProvider>
     </>
@@ -36,11 +39,13 @@ function Root() {
 export default function App() {
   return (
     <>
-      <PreferencesContextProvider>
-        <TrackingsContextProvider>
-          <Root />
-        </TrackingsContextProvider>
-      </PreferencesContextProvider>
+      <AuthContextProvider>
+        <PreferencesContextProvider>
+          <TrackingsContextProvider>
+            <Root />
+          </TrackingsContextProvider>
+        </PreferencesContextProvider>
+      </AuthContextProvider>
     </>
   );
 }
