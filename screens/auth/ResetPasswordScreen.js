@@ -1,0 +1,71 @@
+import { useForm } from "react-hook-form";
+import { StyleSheet, View } from "react-native";
+import {
+  Button,
+  IconButton,
+  Text,
+  TextInput,
+  Portal,
+  Modal,
+} from "react-native-paper";
+import Title from "../../components/ui/Title";
+
+export default function ResetPasswordScreen({ handleResetPassword, navigation }) {
+  const {
+    register,
+    setValue,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: { email: "", password: "" }, // TODO: TK-29
+  });
+
+  const handleGoToSignUp = () => {
+    navigation.navigate("SignUp");
+  };
+
+  const handleGoToSignIn = () => {
+    navigation.navigate("SignIn");
+  };
+
+  const handleResetPasswordPress = (data) => {
+    console.log("handleResetPassword: :", data);
+    // handleResetPassword()
+  };
+
+  return (
+    <View style={styles.rootContainer}>
+      <Title>Reset Password</Title>
+      <TextInput
+        name="email"
+        mode="outlined"
+        error={errors.email}
+        label="Email"
+        placeholder="Drink Water"
+        onChangeText={(text) => setValue("email", text)}
+        {...register("email", {
+          required: true,
+          validate: {
+            requiredInput: (value) => value.trim() !== "",
+          },
+        })}
+      />
+
+      <Button mode="outlined" onPress={handleSubmit(handleResetPasswordPress)}>
+        Send reset password instructions
+      </Button>
+      <Button mode="text" onPress={handleGoToSignUp}>
+        New to Traker? Sign up now!
+      </Button>
+      <Button mode="text" onPress={handleGoToSignIn}>
+        Already have an account? Sign in
+      </Button>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  rootContainer: {
+    flex: 1,
+  },
+});
