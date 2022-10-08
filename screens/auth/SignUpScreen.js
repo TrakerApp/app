@@ -31,10 +31,9 @@ export default function SignUpScreen({ handleSignUp, navigation }) {
 
   return (
     <View style={styles.rootContainer}>
-      <Title style={styles.title}>Welcome to Tracker!</Title>
+      <Title style={styles.title}>Welcome to Tracker</Title>
       <Text style={styles.subtitle}>
-        All your data is backed up and you can even use your same account across
-        all your devices!
+        Sign up now and start tracking all your behaviors and habits in a single place!
       </Text>
       <View style={styles.formContainer}>
         <TextInput
