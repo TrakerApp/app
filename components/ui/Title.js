@@ -1,8 +1,8 @@
 import { StyleSheet } from "react-native";
 import { Text } from "react-native-paper";
 
-export default function Title({ children }) {
-  return <Text style={styles.title}>{children}</Text>;
+export default function Title({ children, style = {} }) {
+  return <Text style={[styles.title, style]}>{children}</Text>;
 }
 
 const styles = StyleSheet.create({

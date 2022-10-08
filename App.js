@@ -15,10 +15,6 @@ function Root() {
   const preferencesContext = useContext(PreferencesContext);
   const authContext = useContext(AuthContext);
   const theme = preferencesContext.isThemeDark ? DarkTheme : DefaultTheme;
-  console.log(
-    "here authContext.isAuthenticated is",
-    authContext.isAuthenticated
-  );
 
   return (
     <>

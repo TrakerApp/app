@@ -35,44 +35,55 @@ export default function SignInScreen({ handleSignIn, navigation }) {
 
   return (
     <View style={styles.rootContainer}>
-      <Title>Sign In</Title>
-      <TextInput
-        name="email"
-        mode="outlined"
-        error={errors.email}
-        label="Email"
-        placeholder="Drink Water"
-        onChangeText={(text) => setValue("email", text)}
-        {...register("email", {
-          required: true,
-          validate: {
-            requiredInput: (value) => value.trim() !== "",
-          },
-        })}
-      />
-      <TextInput
-        name="password"
-        mode="outlined"
-        error={errors.password}
-        label="Password"
-        onChangeText={(text) => setValue("password", text)}
-        {...register("password", {
-          required: true,
-          validate: {
-            requiredInput: (value) => value.trim() !== "",
-          },
-        })}
-      />
+      <Title style={styles.title}>Sign In</Title>
+      <Text style={styles.subtitle}>Welcome back!</Text>
+      <View style={styles.formContainer}>
+        <TextInput
+          name="email"
+          mode="outlined"
+          error={errors.email}
+          label="Email"
+          placeholder="john@gmail.com"
+          style={styles.input}
+          onChangeText={(text) => setValue("email", text)}
+          {...register("email", {
+            required: true,
+            validate: {
+              requiredInput: (value) => value.trim() !== "",
+            },
+          })}
+        />
+        <TextInput
+          name="password"
+          mode="outlined"
+          error={errors.password}
+          label="Password"
+          style={styles.input}
+          onChangeText={(text) => setValue("password", text)}
+          {...register("password", {
+            required: true,
+            validate: {
+              requiredInput: (value) => value.trim() !== "",
+            },
+          })}
+        />
 
-      <Button mode="outlined" onPress={handleSubmit(handleSignInPress)}>
-        Sign In
-      </Button>
-      <Button mode="text" onPress={handleGoToSignUp}>
-        New to Traker? Sign up now!
-      </Button>
-      <Button mode="text" onPress={handleGoToPasswordReset}>
-        Password lost? Recover it
-      </Button>
+        <Button
+          style={styles.outlinedButton}
+          mode="outlined"
+          onPress={handleSubmit(handleSignInPress)}
+        >
+          Sign In
+        </Button>
+        <View style={styles.linksContainer}>
+          <Button mode="text" onPress={handleGoToSignUp}>
+            New to Traker? Sign up now!
+          </Button>
+          <Button mode="text" onPress={handleGoToPasswordReset}>
+            Password lost? Recover it
+          </Button>
+        </View>
+      </View>
     </View>
   );
 }
@@ -80,5 +91,26 @@ export default function SignInScreen({ handleSignIn, navigation }) {
 const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
+    paddingHorizontal: 30,
+  },
+  formContainer: {
+    paddingTop: 20,
+  },
+  linksContainer: {
+    paddingTop: 20,
+  },
+  title: {
+    paddingTop: 80,
+  },
+  subtitle: {
+    paddingTop: 20,
+    fontSize: 20,
+    textAlign: "center",
+  },
+  input: {
+    marginTop: 10,
+  },
+  outlinedButton: {
+    marginTop: 20,
   },
 });
