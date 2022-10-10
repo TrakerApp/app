@@ -1,9 +1,11 @@
 import { View, StyleSheet } from "react-native";
-import { Text, Switch } from "react-native-paper";
+import { Text, Switch, Button } from "react-native-paper";
+import { useAuthContext } from "../../store/context/auth-context";
 import { usePreferencesContext } from "../../store/context/preferences-context";
 
 export default function DrawerContent() {
-  const preferencesContext = usePreferencesContext()
+  const preferencesContext = usePreferencesContext();
+  const authContext = useAuthContext();
 
   return (
     <View style={styles.rootContainer}>
@@ -14,6 +16,10 @@ export default function DrawerContent() {
           preferencesContext.toggleTheme();
         }}
       />
+
+      <Button mode="text" onPress={authContext.signOut}>
+        Sign Out ({authContext.currentUser?.email})
+      </Button>
     </View>
   );
 }

@@ -69,9 +69,9 @@ const extractUser = (data) => {
   return {
     email: data.attributes.email,
     sub: data.attributes.sub,
-    accessToken: data.signInUserSession.accessToken.jwtToken
-  }
-}
+    accessToken: data.signInUserSession.accessToken.jwtToken,
+  };
+};
 
 export const signUp = async (email, password) => {
   try {
@@ -127,7 +127,7 @@ export const signIn = async (email, password) => {
   try {
     const res = await Auth.signIn(email, password);
 
-    return extractUser(res)
+    return extractUser(res);
   } catch (error) {
     console.log("error signing in", error);
 
@@ -149,7 +149,7 @@ export const signIn = async (email, password) => {
 
 export const signOut = async () => {
   try {
-    await Auth.signOut();
+    return await Auth.signOut();
   } catch (error) {
     console.log("error signing out: ", error);
   }
@@ -181,12 +181,19 @@ export const listenToAutoSignIn = () => {
 
 export const currentAuthenticatedUser = () => {
   return new Promise((resolve, reject) => {
-    Auth.currentAuthenticatedUser({
-      bypassCache: false, // Optional, By default is false. If set to true, this call will send a request to Cognito to get the latest user data
-    })
-      .then((data) => {
-        resolve(extractUser(data))
+    try {
+      Auth.currentAuthenticatedUser({
+        bypassCache: false, // Optional, By default is false. If set to true, this call will send a request to Cognito to get the latest user data
       })
-      .catch(reject);
+        .then((data) => {
+          resolve(extractUser(data));
+        })
+        .catch((data) => {
+          resolve({ error: "NotAuthenticated" });
+        });
+    } catch (err) {
+      console.log("error getting current user: ", err);
+      reject(err);
+    }
   });
 };
