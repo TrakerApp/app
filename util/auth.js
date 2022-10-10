@@ -65,6 +65,14 @@ Amplify.configure({
   },
 });
 
+const extractUser = (data) => {
+  return {
+    email: data.attributes.email,
+    sub: data.attributes.sub,
+    accessToken: data.signInUserSession.accessToken.jwtToken
+  }
+}
+
 export const signUp = async (email, password) => {
   try {
     const response = await Auth.signUp({
@@ -119,11 +127,7 @@ export const signIn = async (email, password) => {
   try {
     const res = await Auth.signIn(email, password);
 
-    return {
-      email: res.attributes.email,
-      sub: res.attributes.sub,
-      accessToken: res.signInUserSession.accessToken.jwtToken
-    }
+    return extractUser(res)
   } catch (error) {
     console.log("error signing in", error);
 
@@ -180,7 +184,9 @@ export const currentAuthenticatedUser = () => {
     Auth.currentAuthenticatedUser({
       bypassCache: false, // Optional, By default is false. If set to true, this call will send a request to Cognito to get the latest user data
     })
-      .then(resolve)
+      .then((data) => {
+        resolve(extractUser(data))
+      })
       .catch(reject);
   });
 };

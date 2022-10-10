@@ -1,10 +1,9 @@
-import { useContext } from "react";
 import { View, StyleSheet } from "react-native";
 import { Text, Switch } from "react-native-paper";
-import { PreferencesContext } from "../../store/context/preferences-context";
+import { usePreferencesContext } from "../../store/context/preferences-context";
 
 export default function DrawerContent() {
-  const preferencesContext = useContext(PreferencesContext);
+  const preferencesContext = usePreferencesContext()
 
   return (
     <View style={styles.rootContainer}>

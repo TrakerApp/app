@@ -21,19 +21,19 @@ export default function AuthContextProvider({ children }) {
     setCurrentUser(user);
   }
 
-  // useEffect(() => {
-  //   console.log(
-  //     "Executing useEffect onauthContextProvider for checking user session"
-  //   );
-  //   const load = async () => {
-  //     const signedInUser = await currentAuthenticatedUser();
-  //     console.log("possible user on sign in:", signedInUser);
-  //     if (signedInUser) {
-  //       signIn(signedInUser);
-  //     }
-  //   };
-  //   load();
-  // }, []);
+  useEffect(() => {
+    console.log(
+      "Executing useEffect onauthContextProvider for checking user session"
+    );
+    const load = async () => {
+      const signedInUser = await currentAuthenticatedUser();
+      console.log("possible user on sign in:", signedInUser);
+      if (signedInUser) {
+        signIn(signedInUser);
+      }
+    };
+    load();
+  }, []);
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, isFirstTime, currentUser, signIn }}>
