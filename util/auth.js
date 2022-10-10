@@ -86,8 +86,10 @@ export const signUp = async (email, password) => {
     console.log("error signing up:", error);
     // throw error;
     return {
-      error: error.toString().match(/User.already.exists/) ? 'UserAlreadyExists' : 'ServerError'
-    }
+      error: error.toString().match(/User.already.exists/)
+        ? "UserAlreadyExists"
+        : "ServerError",
+    };
   }
 };
 
@@ -115,12 +117,23 @@ export const resendConfirmationCode = async (email) => {
 
 export const signIn = async (email, password) => {
   try {
-    // TODO: error USER_PASSWORD_AUTH flow not enabled for this client
-    const user = await Auth.signIn(email, password);
-    console.log("on signin user:", user);
-    return user;
+    return await Auth.signIn(email, password);
   } catch (error) {
     console.log("error signing in", error);
+
+    if (error.toString().match(/User.does.not.exist/)) {
+      return { error: "UserDoesNotExist" };
+    }
+
+    if (error.toString().match(/Incorrect.username.or.password/)) {
+      return { error: "IncorrectCredentials" };
+    }
+
+    if (error.toString().match(/User.is.not.confirmed/)) {
+      return { error: "UserNotConfirmed" };
+    }
+
+    return { error: "ServerError" };
   }
 };
 

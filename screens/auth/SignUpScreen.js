@@ -5,6 +5,11 @@ import { Button, Text, TextInput } from "react-native-paper";
 import Title from "../../components/ui/Title";
 import { signUp } from "../../util/auth";
 
+const errorMessages = {
+  UserAlreadyExists: "The email you entered already exists.",
+  ServerError: "There was an error signing in, please try again.",
+};
+
 export default function SignUpScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -87,10 +92,8 @@ export default function SignUpScreen({ navigation }) {
           })}
         />
 
-        {error === "UserAlreadyExists" && (
-          <Text style={styles.error}>
-            The email you entered already exists.
-          </Text>
+        {error !== "" && (
+          <Text style={styles.error}>{errorMessages[error]}</Text>
         )}
 
         <Button

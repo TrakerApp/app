@@ -1,18 +1,22 @@
-import { useEffect } from "react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
-import {
-  Button,
-  IconButton,
-  Text,
-  TextInput,
-  Portal,
-  Modal,
-} from "react-native-paper";
+import { Button, Text, TextInput } from "react-native-paper";
 import Title from "../../components/ui/Title";
-import { currentAuthenticatedUser } from '../../util/auth'
+import { signIn } from "../../util/auth";
 
-export default function SignInScreen({ handleSignIn, navigation }) {
+const errorMessages = {
+  UserDoesNotExist: "The combination of email and password is incorrect.",
+  IncorrectCredentials: "The combination of email and password is incorrect.",
+  UserNotConfirmed:
+    "The email entered has not been confirmed yet, please check your email and confirm it.",
+  ServerError: "There was an error signing in, please try again.",
+};
+
+export default function SignInScreen({ navigation }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const {
     register,
     setValue,
@@ -22,14 +26,6 @@ export default function SignInScreen({ handleSignIn, navigation }) {
     defaultValues: { email: "", password: "" }, // TODO: TK-29
   });
 
-  useEffect(() => {
-    const load = async () => {
-      const possible = await currentAuthenticatedUser()
-      console.log("possible user on sign in:", possible)
-    }
-    load()
-  }, [])
-
   const handleGoToSignUp = () => {
     navigation.navigate("SignUp");
   };
@@ -38,9 +34,22 @@ export default function SignInScreen({ handleSignIn, navigation }) {
     navigation.navigate("ResetPassword");
   };
 
-  const handleSignInPress = (data) => {
-    console.log("SIGNUP: :", data);
-    // handleSignIn()
+  const handleSignInPress = async (data) => {
+    setLoading(true);
+    setError("");
+
+    const res = await signIn(data.email, data.password);
+
+    if (res.error) {
+      setError(res.error);
+      setLoading(false);
+    } else {
+      // https://docs.amplify.aws/lib/auth/emailpassword/q/platform/js/#sign-in
+      // set user session?
+      console.log("RES ON SIGN IN IS:", res);
+      setError("");
+      setLoading(false);
+    }
   };
 
   return (
@@ -50,6 +59,7 @@ export default function SignInScreen({ handleSignIn, navigation }) {
       <View style={styles.formContainer}>
         <TextInput
           name="email"
+          disabled={loading}
           autoComplete="email"
           autoCapitalize="none"
           autoCorrect={false}
@@ -71,6 +81,7 @@ export default function SignInScreen({ handleSignIn, navigation }) {
         />
         <TextInput
           name="password"
+          disabled={loading}
           secureTextEntry={true}
           textContentType="password"
           mode="outlined"
@@ -86,18 +97,27 @@ export default function SignInScreen({ handleSignIn, navigation }) {
           })}
         />
 
+        {error !== "" && (
+          <Text style={styles.error}>{errorMessages[error]}</Text>
+        )}
+
         <Button
           style={styles.outlinedButton}
           mode="outlined"
+          disabled={loading}
           onPress={handleSubmit(handleSignInPress)}
         >
           Sign In
         </Button>
         <View style={styles.linksContainer}>
-          <Button mode="text" onPress={handleGoToSignUp}>
+          <Button mode="text" onPress={handleGoToSignUp} disabled={loading}>
             New to Traker? Sign up now!
           </Button>
-          <Button mode="text" onPress={handleGoToPasswordReset}>
+          <Button
+            mode="text"
+            onPress={handleGoToPasswordReset}
+            disabled={loading}
+          >
             Password lost? Recover it
           </Button>
         </View>
@@ -124,6 +144,11 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     fontSize: 20,
     textAlign: "center",
+  },
+  error: {
+    color: "red",
+    textAlign: "center",
+    paddingTop: 10,
   },
   input: {
     marginTop: 10,
