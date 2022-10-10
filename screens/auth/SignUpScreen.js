@@ -33,6 +33,7 @@ export default function SignUpScreen({ handleSignUp, navigation }) {
     console.log("user:", user)
     console.log("userConfirmed:", userConfirmed)
     console.log("userSub:", userSub)
+    navigation.navigate("Confirmation", { userEmail: data.email });
 
     // const res = await confirmSignUp(data.email, "050483")
     // this works but we get USER_PASSWORD_AUTH flow not enabled for this client

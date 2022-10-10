@@ -102,8 +102,9 @@ export const confirmSignUp = async (email, code) => {
 
 export const resendConfirmationCode = async (email) => {
   try {
-    await Auth.resendSignUp(email);
+    const res = await Auth.resendSignUp(email);
     console.log("code resent successfully");
+    return res
   } catch (err) {
     console.log("error resending code: ", err);
   }
