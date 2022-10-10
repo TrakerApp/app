@@ -40,6 +40,12 @@ export default function SignInScreen({ handleSignIn, navigation }) {
       <View style={styles.formContainer}>
         <TextInput
           name="email"
+          autoComplete="email"
+          autoCapitalize="none"
+          autoCorrect={false}
+          autoFocus={true}
+          keyboardType="email-address"
+          textContentType="emailAddress"
           mode="outlined"
           error={errors.email}
           label="Email"
@@ -55,6 +61,8 @@ export default function SignInScreen({ handleSignIn, navigation }) {
         />
         <TextInput
           name="password"
+          secureTextEntry={true}
+          textContentType="password"
           mode="outlined"
           error={errors.password}
           label="Password"

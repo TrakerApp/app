@@ -45,6 +45,12 @@ export default function ResetPasswordScreen({
       <View style={styles.formContainer}>
         <TextInput
           name="email"
+          autoComplete="email"
+          autoCapitalize="none"
+          autoCorrect={false}
+          autoFocus={true}
+          keyboardType="email-address"
+          textContentType="emailAddress"
           mode="outlined"
           error={errors.email}
           label="Email"

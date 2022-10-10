@@ -9,6 +9,7 @@ import {
   Modal,
 } from "react-native-paper";
 import Title from "../../components/ui/Title";
+import { signUp, signIn } from "../../util/auth";
 
 export default function SignUpScreen({ handleSignUp, navigation }) {
   const {
@@ -24,8 +25,23 @@ export default function SignUpScreen({ handleSignUp, navigation }) {
     navigation.navigate("SignIn");
   };
 
-  const handleSignUpPress = (data) => {
+  const handleSignUpPress = async (data) => {
     console.log("SIGNUP: :", data);
+    const res = await signUp(data.email, data.password);
+    const { user, userConfirmed, userSub } = res;
+    console.log("res:", res)
+    console.log("user:", user)
+    console.log("userConfirmed:", userConfirmed)
+    console.log("userSub:", userSub)
+
+    // const res = await confirmSignUp(data.email, "050483")
+    // this works but we get USER_PASSWORD_AUTH flow not enabled for this client
+
+    // const res = await signIn(data.email, data.password)
+    // console.log("in screen res:", res)
+    // this works but we get USER_PASSWORD_AUTH flow not enabled for this client
+
+    // signUp(data.email, data.password)
     // handleSignUp()
   };
 
@@ -38,6 +54,12 @@ export default function SignUpScreen({ handleSignUp, navigation }) {
       <View style={styles.formContainer}>
         <TextInput
           name="email"
+          autoComplete="email"
+          autoCapitalize="none"
+          autoCorrect={false}
+          autoFocus={true}
+          keyboardType="email-address"
+          textContentType="emailAddress"
           mode="outlined"
           error={errors.email}
           label="Email"
@@ -53,6 +75,8 @@ export default function SignUpScreen({ handleSignUp, navigation }) {
         />
         <TextInput
           name="password"
+          secureTextEntry={true}
+          textContentType="password"
           mode="outlined"
           error={errors.password}
           label="Password"
