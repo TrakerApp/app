@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
 import {
@@ -9,6 +10,7 @@ import {
   Modal,
 } from "react-native-paper";
 import Title from "../../components/ui/Title";
+import { currentAuthenticatedUser } from '../../util/auth'
 
 export default function SignInScreen({ handleSignIn, navigation }) {
   const {
@@ -19,6 +21,14 @@ export default function SignInScreen({ handleSignIn, navigation }) {
   } = useForm({
     defaultValues: { email: "", password: "" }, // TODO: TK-29
   });
+
+  useEffect(() => {
+    const load = async () => {
+      const possible = await currentAuthenticatedUser()
+      console.log("possible user on sign in:", possible)
+    }
+    load()
+  }, [])
 
   const handleGoToSignUp = () => {
     navigation.navigate("SignUp");

@@ -11,13 +11,13 @@ export default function UnauthenticatedNavigator() {
     <Stack.Navigator>
       <Stack.Screen
         options={{ headerShown: false }}
-        name="Confirmation"
-        component={ConfirmationScreen}
+        name="SignUp"
+        component={SignUpScreen}
       />
       <Stack.Screen
         options={{ headerShown: false }}
-        name="SignUp"
-        component={SignUpScreen}
+        name="Confirmation"
+        component={ConfirmationScreen}
       />
       <Stack.Screen
         options={{ headerShown: false }}

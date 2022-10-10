@@ -10,16 +10,19 @@ import {
   Modal,
 } from "react-native-paper";
 import Title from "../../components/ui/Title";
-import { confirmSignUp, resendConfirmationCode } from "../../util/auth";
+import {
+  confirmSignUp,
+  resendConfirmationCode,
+  listenToAutoSignIn,
+} from "../../util/auth";
 
 export default function ConfirmationScreen({
   handleConfirm,
   navigation,
   route,
 }) {
-  // const { userEmail } = route.params;
-  const userEmail = 'carlosr706+4@gmail.com'
-  console.log("loading confirm with userEmail:", userEmail)
+  const userEmail = route?.params?.userEmail || "";
+  console.log("loading confirm with userEmail:", userEmail);
 
   const {
     register,
@@ -31,18 +34,34 @@ export default function ConfirmationScreen({
     defaultValues: { email: userEmail, code: "" }, // TODO: TK-29
   });
 
+  useEffect(() => {
+    console.log("LOADING THE LISTENING HUB")
+    console.log("LOADING THE LISTENING HUB")
+    console.log("LOADING THE LISTENING HUB")
+    console.log("LOADING THE LISTENING HUB")
+    console.log("LOADING THE LISTENING HUB")
+    listenToAutoSignIn()
+      .then((user) => {
+        console.log("user from auth received in handleConfirmPress:", user);
+        // handleConfirm()
+      })
+      .catch((err) => {
+        console.log("error from auth received in handleConfirmPress:", err);
+      });
+  }, []);
+
   const handleResendCodePress = async () => {
     // navigation.navigate("SignUp");
     console.log("resend code");
-    const email = getValues("email")
+    const email = getValues("email");
     const res = await resendConfirmationCode(email);
-    console.log("resending res:", res)
+    console.log("resending res:", res);
   };
 
   const handleConfirmPress = async (data) => {
     console.log("handleConfirm:", data);
     const res = await confirmSignUp(data.email, data.code);
-    console.log("confirmation res:", res)
+    console.log("confirmation res:", res);
 
     // handleConfirm()
   };
@@ -51,7 +70,8 @@ export default function ConfirmationScreen({
     <View style={styles.rootContainer}>
       <Title style={styles.title}>Confirm</Title>
       <Text style={styles.subtitle}>
-        You should have received a 6 digit code in your email, please enter it below.
+        You should have received a 6 digit code in your email, please enter it
+        below.
       </Text>
       <View style={styles.formContainer}>
         <TextInput

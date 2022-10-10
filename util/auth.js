@@ -1,6 +1,6 @@
 // https://docs.amplify.aws/lib/auth/getting-started/q/platform/js/#configure-your-application
 // https://docs.amplify.aws/lib/auth/start/q/platform/js/#create-new-authentication-resource
-import { Amplify, Auth } from "aws-amplify";
+import { Amplify, Auth, Hub } from "aws-amplify";
 import { COGNITO_POOL_ID, COGNITO_CLIENT_ID } from "@env";
 
 Amplify.configure({
@@ -84,7 +84,10 @@ export const signUp = async (email, password) => {
     return response;
   } catch (error) {
     console.log("error signing up:", error);
-    throw error;
+    // throw error;
+    return {
+      error: error.toString().match(/User.already.exists/) ? 'UserAlreadyExists' : 'ServerError'
+    }
   }
 };
 
@@ -104,7 +107,7 @@ export const resendConfirmationCode = async (email) => {
   try {
     const res = await Auth.resendSignUp(email);
     console.log("code resent successfully");
-    return res
+    return res;
   } catch (err) {
     console.log("error resending code: ", err);
   }
@@ -131,8 +134,34 @@ export const signOut = async () => {
 
 export const globalSignOut = async () => {
   try {
-      await Auth.signOut({ global: true });
+    await Auth.signOut({ global: true });
   } catch (error) {
-      console.log('error signing out: ', error);
+    console.log("error signing out: ", error);
   }
-}
+};
+
+export const listenToAutoSignIn = () => {
+  return new Promise((resolve, reject) => {
+    Hub.listen("auth", ({ payload }) => {
+      const { event } = payload;
+      console.log("listening on auth received event ", event);
+      if (event === "autoSignIn") {
+        console.log("auto listen worked! payload.data:", payload.data);
+        resolve(payload.data);
+      } else if (event === "autoSignIn_failure") {
+        console.log("auto sign in failed!payload.data:", payload.data);
+        reject(payload.data);
+      }
+    });
+  });
+};
+
+export const currentAuthenticatedUser = () => {
+  return new Promise((resolve, reject) => {
+    Auth.currentAuthenticatedUser({
+      bypassCache: false, // Optional, By default is false. If set to true, this call will send a request to Cognito to get the latest user data
+    })
+      .then(resolve)
+      .catch(reject);
+  });
+};
