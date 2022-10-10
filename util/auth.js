@@ -117,7 +117,13 @@ export const resendConfirmationCode = async (email) => {
 
 export const signIn = async (email, password) => {
   try {
-    return await Auth.signIn(email, password);
+    const res = await Auth.signIn(email, password);
+
+    return {
+      email: res.attributes.email,
+      sub: res.attributes.sub,
+      accessToken: res.signInUserSession.accessToken.jwtToken
+    }
   } catch (error) {
     console.log("error signing in", error);
 

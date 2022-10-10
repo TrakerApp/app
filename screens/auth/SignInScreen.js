@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
 import Title from "../../components/ui/Title";
+import { useAuthContext } from "../../store/context/auth-context";
 import { signIn } from "../../util/auth";
 
 const errorMessages = {
@@ -16,6 +17,7 @@ const errorMessages = {
 export default function SignInScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const authContext = useAuthContext()
 
   const {
     register,
@@ -38,17 +40,16 @@ export default function SignInScreen({ navigation }) {
     setLoading(true);
     setError("");
 
-    const res = await signIn(data.email, data.password);
+    const user = await signIn(data.email, data.password);
 
-    if (res.error) {
-      setError(res.error);
+    if (user.error) {
+      setError(user.error);
       setLoading(false);
     } else {
       // https://docs.amplify.aws/lib/auth/emailpassword/q/platform/js/#sign-in
-      // set user session?
-      console.log("RES ON SIGN IN IS:", res);
       setError("");
       setLoading(false);
+      authContext.signIn(user);
     }
   };
 
