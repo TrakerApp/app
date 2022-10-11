@@ -1,7 +1,7 @@
 import { createStackNavigator } from "@react-navigation/stack";
 import SignUpScreen from "../screens/auth/SignUpScreen";
 import SignInScreen from "../screens/auth/SignInScreen";
-import ResetPasswordScreen from "../screens/auth/ResetPasswordScreen";
+import ForgotPasswordScreen from "../screens/auth/ForgotPasswordScreen";
 import ConfirmationScreen from "../screens/auth/ConfirmationScreen";
 
 const Stack = createStackNavigator();
@@ -26,8 +26,8 @@ export default function UnauthenticatedNavigator() {
       />
       <Stack.Screen
         options={{ headerShown: false }}
-        name="ResetPassword"
-        component={ResetPasswordScreen}
+        name="ForgotPassword"
+        component={ForgotPasswordScreen}
       />
     </Stack.Navigator>
   );

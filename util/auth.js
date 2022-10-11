@@ -206,9 +206,57 @@ export const currentAuthenticatedUser = ({ bypassCache = false }) => {
           console.log("error getting current authenticated user:", data);
           resolve({ error: "NotAuthenticated" });
         });
-    } catch (err) {
-      console.log("error getting current user: ", err);
-      reject(err);
+    } catch (error) {
+      console.log("error getting current user: ", error);
+      reject(error);
     }
   });
 };
+
+export const forgotPassword = (email) => {
+  return new Promise((resolve, reject) => {
+    try {
+      Auth.forgotPassword(email)
+        .then(data => resolve(data))
+        .catch(error => {
+          console.log("ERROR on forgotPassword .catch:", error)
+
+          if (error.toString().match(/UserNotFoundException/)) {
+            resolve({ error: "UserNotFound" });
+          }
+          if (error.toString().match(/InvalidParameterException/)) {
+            resolve({ error: "UserNotConfirmed" });
+          }
+
+          resolve({ error: "CouldNotSendCode" })
+        });
+    } catch (error) {
+      console.log("error sending forgot password code: ", error);
+      resolve({ error: "ServerError" })
+    }
+  });
+}
+
+export const forgotPasswordSubmit = (email, code, newPassword) => {
+  return new Promise((resolve, reject) => {
+    try {
+      Auth.forgotPasswordSubmit(email, code, newPassword)
+        .then(data => resolve(data))
+        .catch(error => {
+          console.log("ERROR on forgotPassword .catch:", error)
+
+          // if (error.toString().match(/UserNotFoundException/)) {
+          //   resolve({ error: "UserNotFound" });
+          // }
+          // if (error.toString().match(/InvalidParameterException/)) {
+          //   resolve({ error: "UserNotConfirmed" });
+          // }
+
+          resolve({ error: "CouldNotSetNewPassword" })
+        });
+    } catch (error) {
+      console.log("error sending setting new password on forgot password: ", error);
+      resolve({ error: "ServerError" })
+    }
+  });
+}

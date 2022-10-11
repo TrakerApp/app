@@ -7,8 +7,8 @@ import { useAuthContext } from "../../store/context/auth-context";
 import { signIn } from "../../util/auth";
 
 const errorMessages = {
-  UserDoesNotExist: "The combination of email and password is incorrect.",
-  IncorrectCredentials: "The combination of email and password is incorrect.",
+  UserDoesNotExist: "Email or password is incorrect.",
+  IncorrectCredentials: "Email or password is incorrect.",
   UserNotConfirmed:
     "The email entered has not been confirmed yet, please check your email and confirm it.",
   ServerError: "There was an error signing in, please try again.",
@@ -42,9 +42,9 @@ export default function SignInScreen({ navigation, route }) {
     navigation.navigate("SignUp");
   };
 
-  const handleGoToPasswordReset = () => {
+  const handleGoToForgotPassword = () => {
     setSuccessMessage("");
-    navigation.navigate("ResetPassword", { userEmail: getValues("email") });
+    navigation.replace("ForgotPassword", { userEmail: getValues("email") });
   };
 
   const handleGoToConfirmation = () => {
@@ -137,7 +137,7 @@ export default function SignInScreen({ navigation, route }) {
           </Button>
           <Button
             mode="text"
-            onPress={handleGoToPasswordReset}
+            onPress={handleGoToForgotPassword}
             disabled={loading}
           >
             Password lost? Recover it
