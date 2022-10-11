@@ -224,8 +224,13 @@ export const forgotPassword = (email) => {
           if (error.toString().match(/UserNotFoundException/)) {
             resolve({ error: "UserNotFound" });
           }
+
           if (error.toString().match(/InvalidParameterException/)) {
             resolve({ error: "UserNotConfirmed" });
+          }
+
+          if (error.toString().match(/LimitExceededException/)) {
+            resolve({ error: "LimitExceeded" });
           }
 
           resolve({ error: "CouldNotSendCode" })
@@ -245,12 +250,25 @@ export const forgotPasswordSubmit = (email, code, newPassword) => {
         .catch(error => {
           console.log("ERROR on forgotPassword .catch:", error)
 
-          // if (error.toString().match(/UserNotFoundException/)) {
-          //   resolve({ error: "UserNotFound" });
-          // }
-          // if (error.toString().match(/InvalidParameterException/)) {
-          //   resolve({ error: "UserNotConfirmed" });
-          // }
+          if (error.toString().match(/Password.not.long.enough/)) {
+            resolve({ error: "PasswordNotLongEnough" });
+          }
+
+          if (error.toString().match(/ExpiredCodeException/)) {
+            resolve({ error: "ExpiredCode" });
+          }
+
+          if (error.toString().match(/CodeMismatchException/)) {
+            resolve({ error: "InvalidCode" });
+          }
+
+          if (error.toString().match(/UserNotFoundException/)) {
+            resolve({ error: "UserNotFound" });
+          }
+
+          if (error.toString().match(/LimitExceededException/)) {
+            resolve({ error: "LimitExceeded" });
+          }
 
           resolve({ error: "CouldNotSetNewPassword" })
         });
