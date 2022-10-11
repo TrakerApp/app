@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
@@ -17,8 +17,15 @@ const errorMessages = {
 export default function SignInScreen({ navigation, route }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const authContext = useAuthContext();
   const userEmail = route?.params?.userEmail || "";
+
+  useEffect(() => {
+    if (route?.params?.successMessage) {
+      setSuccessMessage(route.params.successMessage);
+    }
+  }, [route?.params?.successMessage])
 
   const {
     register,
@@ -31,20 +38,24 @@ export default function SignInScreen({ navigation, route }) {
   });
 
   const handleGoToSignUp = () => {
+    setSuccessMessage("");
     navigation.navigate("SignUp");
   };
 
   const handleGoToPasswordReset = () => {
-    navigation.navigate("ResetPassword");
+    setSuccessMessage("");
+    navigation.navigate("ResetPassword", { userEmail: getValues("email") });
   };
 
   const handleGoToConfirmation = () => {
-    navigation.navigate("Confirmation", { userEmail: getValues("email") });
+    setSuccessMessage("");
+    navigation.replace("Confirmation", { userEmail: getValues("email") });
   };
 
   const handleSignInPress = async (data) => {
     setLoading(true);
     setError("");
+    setSuccessMessage("");
 
     const user = await signIn(data.email, data.password);
 
@@ -108,6 +119,9 @@ export default function SignInScreen({ navigation, route }) {
         {error !== "" && (
           <Text style={styles.error}>{errorMessages[error]}</Text>
         )}
+        {successMessage !== "" && (
+          <Text style={styles.success}>{successMessage}</Text>
+        )}
 
         <Button
           style={styles.outlinedButton}
@@ -162,6 +176,11 @@ const styles = StyleSheet.create({
   },
   error: {
     color: "red",
+    textAlign: "center",
+    paddingTop: 10,
+  },
+  success: {
+    color: "green",
     textAlign: "center",
     paddingTop: 10,
   },

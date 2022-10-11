@@ -24,7 +24,7 @@ export default function SignUpScreen({ navigation }) {
   });
 
   const handleGoToSignIn = () => {
-    navigation.navigate("SignIn");
+    navigation.replace("SignIn");
   };
 
   const handleSignUpPress = async (data) => {
@@ -38,7 +38,7 @@ export default function SignUpScreen({ navigation }) {
       setLoading(false);
     } else {
       // https://docs.amplify.aws/lib/auth/emailpassword/q/platform/js/#sign-up
-      navigation.navigate("Confirmation", { userEmail: data.email });
+      navigation.replace("Confirmation", { userEmail: data.email });
       setError("");
       setLoading(false);
     }

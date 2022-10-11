@@ -24,6 +24,7 @@ const errorMessages = {
 export default function ConfirmationScreen({ navigation, route }) {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
   const authContext = useAuthContext();
   const userEmail = route?.params?.userEmail || "";
 
@@ -46,7 +47,7 @@ export default function ConfirmationScreen({ navigation, route }) {
           // This happens when user creates two accounts and confirms the first one, I think the stored token is from the last one so it can't be confirmed
           navigation.navigate("SignIn", {
             userEmail: getValues("email"),
-            success: "Thanks for confirming, please sign in.",
+            successMessage: "Thanks for confirming, please sign in.",
           });
         } else {
           authContext.signIn(data);
@@ -60,11 +61,13 @@ export default function ConfirmationScreen({ navigation, route }) {
   const handleResendCodePress = async () => {
     setLoading(true);
     setError("")
+    setSuccessMessage("")
     const email = getValues("email");
     const res = await resendConfirmationCode(email);
     if (res.error) {
       setError(res.error);
     } else {
+      setSuccessMessage("Code resent successfully");
       console.log("resending res:", res);
     }
     setLoading(false);
@@ -73,28 +76,31 @@ export default function ConfirmationScreen({ navigation, route }) {
   const handleConfirmPress = async (data) => {
     setLoading(true);
     setError("")
+    setSuccessMessage("")
     const res = await confirmSignUp(data.email, data.code);
     if (res.error) {
       setError(res.error);
     } else {
       // Signed in, wait around 3 seconds for the listenToAutoSignIn callback, which if doesn't happens, we should redirect user to signIn if not signed in
       setTimeout(async () => {
+        if (authContext.isAuthenticated) { return }
+
         await authContext.checkIfUserIsAuthenticated({ bypassCache: true });
 
         if (!authContext.isAuthenticated) {
           navigation.navigate("SignIn", {
             userEmail: getValues("email"),
-            success: "Thanks for confirming, please sign in.",
+            successMessage: "Thanks for confirming, please sign in.",
           });
         }
-      })
+      }, 3_000)
     }
     console.log("confirmation res:", res);
     setLoading(false);
   };
 
   const handleSignInPress = () => {
-    navigation.replace("SignIn", { userEmail: getValues("email") });
+    navigation.navigate("SignIn", { userEmail: getValues("email") });
   };
 
   return (
@@ -153,6 +159,9 @@ export default function ConfirmationScreen({ navigation, route }) {
         {error !== "" && (
           <Text style={styles.error}>{errorMessages[error]}</Text>
         )}
+        {successMessage !== "" && (
+          <Text style={styles.success}>{successMessage}</Text>
+        )}
 
         <Button
           mode="outlined"
@@ -200,6 +209,11 @@ const styles = StyleSheet.create({
   },
   error: {
     color: "red",
+    textAlign: "center",
+    paddingTop: 10,
+  },
+  success: {
+    color: "green",
     textAlign: "center",
     paddingTop: 10,
   },
