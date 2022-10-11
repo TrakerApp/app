@@ -14,18 +14,20 @@ const errorMessages = {
   ServerError: "There was an error signing in, please try again.",
 };
 
-export default function SignInScreen({ navigation }) {
+export default function SignInScreen({ navigation, route }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const authContext = useAuthContext()
+  const authContext = useAuthContext();
+  const userEmail = route?.params?.userEmail || "";
 
   const {
     register,
     setValue,
+    getValues,
     handleSubmit,
     formState: { errors },
   } = useForm({
-    defaultValues: { email: "", password: "" }, // TODO: TK-29
+    defaultValues: { email: userEmail, password: "" }, // TODO: TK-29
   });
 
   const handleGoToSignUp = () => {
@@ -34,6 +36,10 @@ export default function SignInScreen({ navigation }) {
 
   const handleGoToPasswordReset = () => {
     navigation.navigate("ResetPassword");
+  };
+
+  const handleGoToConfirmation = () => {
+    navigation.navigate("Confirmation", { userEmail: getValues("email") });
   };
 
   const handleSignInPress = async (data) => {
@@ -71,6 +77,7 @@ export default function SignInScreen({ navigation }) {
           error={errors.email}
           label="Email"
           placeholder="john@gmail.com"
+          defaultValue={userEmail}
           style={styles.input}
           onChangeText={(text) => setValue("email", text)}
           {...register("email", {
@@ -120,6 +127,13 @@ export default function SignInScreen({ navigation }) {
             disabled={loading}
           >
             Password lost? Recover it
+          </Button>
+          <Button
+            mode="text"
+            onPress={handleGoToConfirmation}
+            disabled={loading}
+          >
+            Account not confirmed? Confirm it
           </Button>
         </View>
       </View>

@@ -105,11 +105,16 @@ export const confirmSignUp = async (email, code) => {
   try {
     const response = await Auth.confirmSignUp(email, code);
     // response: SUCCESS
-    // TODO: https://stackoverflow.com/questions/49000676/aws-cognito-authentication-user-password-auth-flow-not-enabled-for-this-client
     return response;
   } catch (error) {
     console.log("error confirming sign up:", error);
-    throw error;
+    if (error.toString().match(/CodeMismatchException/)) {
+      return { error: "InvalidVerificationCode" };
+    }
+    if (error.toString().match(/UserNotFoundException/)) {
+      return { error: "UserNotFound" };
+    }
+    return { error: "CouldNotConfirm" };
   }
 };
 
@@ -120,6 +125,13 @@ export const resendConfirmationCode = async (email) => {
     return res;
   } catch (err) {
     console.log("error resending code: ", err);
+    if (err.toString().match(/User.is.already.confirmed/)) {
+      return { error: "UserAlreadyConfirmed" };
+    }
+    if (err.toString().match(/UserNotFoundException/)) {
+      return { error: "UserNotFound" };
+    }
+    return { error: "CouldNotResendCode" };
   }
 };
 
@@ -159,36 +171,39 @@ export const globalSignOut = async () => {
   try {
     await Auth.signOut({ global: true });
   } catch (error) {
-    console.log("error signing out: ", error);
+    console.log("error signing out globally: ", error);
   }
 };
 
 export const listenToAutoSignIn = () => {
   return new Promise((resolve, reject) => {
-    Hub.listen("auth", ({ payload }) => {
-      const { event } = payload;
-      console.log("listening on auth received event ", event);
-      if (event === "autoSignIn") {
-        console.log("auto listen worked! payload.data:", payload.data);
-        resolve(payload.data);
-      } else if (event === "autoSignIn_failure") {
-        console.log("auto sign in failed!payload.data:", payload.data);
-        reject(payload.data);
-      }
-    });
+    try {
+      Hub.listen("auth", ({ payload }) => {
+        const { event } = payload;
+        if (event === "autoSignIn") {
+          resolve(extractUser(payload.data));
+        } else if (event === "autoSignIn_failure") {
+          console.log("auto sign in failed!payload.data:", payload.data);
+          resolve({ error: "AutoSignInFailed" });
+        }
+      });
+    } catch (error) {
+      console.log("ERROR IN THE HUB.LISTEN CODE!  error:", error);
+    }
   });
 };
 
-export const currentAuthenticatedUser = () => {
+export const currentAuthenticatedUser = ({ bypassCache = false }) => {
   return new Promise((resolve, reject) => {
     try {
       Auth.currentAuthenticatedUser({
-        bypassCache: false, // Optional, By default is false. If set to true, this call will send a request to Cognito to get the latest user data
+        bypassCache: bypassCache, // Optional, By default is false. If set to true, this call will send a request to Cognito to get the latest user data
       })
         .then((data) => {
           resolve(extractUser(data));
         })
         .catch((data) => {
+          console.log("error getting current authenticated user:", data);
           resolve({ error: "NotAuthenticated" });
         });
     } catch (err) {

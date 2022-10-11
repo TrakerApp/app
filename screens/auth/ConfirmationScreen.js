@@ -1,28 +1,31 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
-import {
-  Button,
-  IconButton,
-  Text,
-  TextInput,
-  Portal,
-  Modal,
-} from "react-native-paper";
+import { Button, Text, TextInput } from "react-native-paper";
 import Title from "../../components/ui/Title";
+import { useAuthContext } from "../../store/context/auth-context";
 import {
   confirmSignUp,
   resendConfirmationCode,
   listenToAutoSignIn,
 } from "../../util/auth";
 
-export default function ConfirmationScreen({
-  handleConfirm,
-  navigation,
-  route,
-}) {
+const errorMessages = {
+  InvalidVerificationCode: "The verification code is invalid.",
+  UserNotFound: "The email introduced was not found.",
+  CouldNotConfirm:
+    "There was an error confirming your account, please try again.",
+  UserAlreadyConfirmed: "The account is already confirmed.",
+  UserNotFound: "The email introduced was not found.",
+  CouldNotResendCode:
+    "There was an error resending the code, please try again.",
+};
+
+export default function ConfirmationScreen({ navigation, route }) {
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const authContext = useAuthContext();
   const userEmail = route?.params?.userEmail || "";
-  console.log("loading confirm with userEmail:", userEmail);
 
   const {
     register,
@@ -35,15 +38,19 @@ export default function ConfirmationScreen({
   });
 
   useEffect(() => {
-    console.log("LOADING THE LISTENING HUB")
-    console.log("LOADING THE LISTENING HUB")
-    console.log("LOADING THE LISTENING HUB")
-    console.log("LOADING THE LISTENING HUB")
-    console.log("LOADING THE LISTENING HUB")
+    console.log("LOADING THE LISTENING HUB");
     listenToAutoSignIn()
-      .then((user) => {
-        console.log("user from auth received in handleConfirmPress:", user);
-        // handleConfirm()
+      .then((data) => {
+        console.log("user from auth received in handleConfirmPress:", data);
+        if (data.error === "AutoSignInFailed") {
+          // This happens when user creates two accounts and confirms the first one, I think the stored token is from the last one so it can't be confirmed
+          navigation.navigate("SignIn", {
+            userEmail: getValues("email"),
+            success: "Thanks for confirming, please sign in.",
+          });
+        } else {
+          authContext.signIn(data);
+        }
       })
       .catch((err) => {
         console.log("error from auth received in handleConfirmPress:", err);
@@ -51,19 +58,43 @@ export default function ConfirmationScreen({
   }, []);
 
   const handleResendCodePress = async () => {
-    // navigation.navigate("SignUp");
-    console.log("resend code");
+    setLoading(true);
+    setError("")
     const email = getValues("email");
     const res = await resendConfirmationCode(email);
-    console.log("resending res:", res);
+    if (res.error) {
+      setError(res.error);
+    } else {
+      console.log("resending res:", res);
+    }
+    setLoading(false);
   };
 
   const handleConfirmPress = async (data) => {
-    console.log("handleConfirm:", data);
+    setLoading(true);
+    setError("")
     const res = await confirmSignUp(data.email, data.code);
-    console.log("confirmation res:", res);
+    if (res.error) {
+      setError(res.error);
+    } else {
+      // Signed in, wait around 3 seconds for the listenToAutoSignIn callback, which if doesn't happens, we should redirect user to signIn if not signed in
+      setTimeout(async () => {
+        await authContext.checkIfUserIsAuthenticated({ bypassCache: true });
 
-    // handleConfirm()
+        if (!authContext.isAuthenticated) {
+          navigation.navigate("SignIn", {
+            userEmail: getValues("email"),
+            success: "Thanks for confirming, please sign in.",
+          });
+        }
+      })
+    }
+    console.log("confirmation res:", res);
+    setLoading(false);
+  };
+
+  const handleSignInPress = () => {
+    navigation.replace("SignIn", { userEmail: getValues("email") });
   };
 
   return (
@@ -76,6 +107,7 @@ export default function ConfirmationScreen({
       <View style={styles.formContainer}>
         <TextInput
           name="email"
+          disabled={loading}
           autoComplete="email"
           autoCapitalize="none"
           autoCorrect={false}
@@ -98,6 +130,7 @@ export default function ConfirmationScreen({
 
         <TextInput
           name="code"
+          disabled={loading}
           autoComplete="off"
           autoCapitalize="none"
           autoCorrect={false}
@@ -106,7 +139,7 @@ export default function ConfirmationScreen({
           textContentType="oneTimeCode"
           mode="outlined"
           error={errors.code}
-          label="code"
+          label="Code"
           style={styles.input}
           onChangeText={(text) => setValue("code", text)}
           {...register("code", {
@@ -117,16 +150,28 @@ export default function ConfirmationScreen({
           })}
         />
 
+        {error !== "" && (
+          <Text style={styles.error}>{errorMessages[error]}</Text>
+        )}
+
         <Button
           mode="outlined"
+          disabled={loading}
           style={styles.outlinedButton}
           onPress={handleSubmit(handleConfirmPress)}
         >
           Confirm
         </Button>
         <View style={styles.linksContainer}>
-          <Button mode="text" onPress={handleResendCodePress}>
+          <Button
+            mode="text"
+            onPress={handleResendCodePress}
+            disabled={loading}
+          >
             You haven't received the code? Resend
+          </Button>
+          <Button mode="text" onPress={handleSignInPress} disabled={loading}>
+            Already confirmed? Sign in
           </Button>
         </View>
       </View>
@@ -152,6 +197,11 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     fontSize: 20,
     textAlign: "center",
+  },
+  error: {
+    color: "red",
+    textAlign: "center",
+    paddingTop: 10,
   },
   input: {
     marginTop: 10,
