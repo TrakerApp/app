@@ -10,7 +10,7 @@ const errorMessages = {
   UserNotConfirmed:
     "The email entered has not been confirmed yet, please check your email and confirm it.",
   CouldNotSendCode: "There was an error sending the code, please try again.",
-  PasswordNotLongEnough: "Password length must be at least 8 characters.",
+  PasswordNotLongEnough: "Password length must be at least 6 characters.",
   InvalidCode: "The code introduced is invalid.",
   ExpiredCode: "The code introduced is expired, request a new one.",
   LimitExceeded: "You are requesting too many codes, please try again later.",
