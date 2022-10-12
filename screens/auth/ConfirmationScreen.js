@@ -60,8 +60,8 @@ export default function ConfirmationScreen({ navigation, route }) {
 
   const handleResendCodePress = async () => {
     setLoading(true);
-    setError("")
-    setSuccessMessage("")
+    setError("");
+    setSuccessMessage("");
     const email = getValues("email");
     const res = await resendConfirmationCode(email);
     if (res.error) {
@@ -75,15 +75,17 @@ export default function ConfirmationScreen({ navigation, route }) {
 
   const handleConfirmPress = async (data) => {
     setLoading(true);
-    setError("")
-    setSuccessMessage("")
+    setError("");
+    setSuccessMessage("");
     const res = await confirmSignUp(data.email, data.code);
     if (res.error) {
       setError(res.error);
     } else {
       // Signed in, wait around 3 seconds for the listenToAutoSignIn callback, which if doesn't happens, we should redirect user to signIn if not signed in
       setTimeout(async () => {
-        if (authContext.isAuthenticated) { return }
+        if (authContext.isAuthenticated) {
+          return;
+        }
 
         await authContext.checkIfUserIsAuthenticated({ bypassCache: true });
 
@@ -93,7 +95,7 @@ export default function ConfirmationScreen({ navigation, route }) {
             successMessage: "Thanks for confirming, please sign in.",
           });
         }
-      }, 3_000)
+      }, 3_000);
     }
     console.log("confirmation res:", res);
     setLoading(false);
@@ -111,49 +113,23 @@ export default function ConfirmationScreen({ navigation, route }) {
         below.
       </Text>
       <View style={styles.formContainer}>
-        <TextInput
-          name="email"
-          disabled={loading}
-          autoComplete="email"
-          autoCapitalize="none"
-          autoCorrect={false}
-          keyboardType="email-address"
-          textContentType="emailAddress"
-          mode="outlined"
-          error={errors.email}
-          label="Email"
-          placeholder="john@gmail.com"
-          style={styles.input}
+        <AuthEmailInput
+          loading={loading}
           defaultValue={userEmail}
-          onChangeText={(text) => setValue("email", text)}
-          {...register("email", {
-            required: true,
-            validate: {
-              requiredInput: (value) => value.trim() !== "",
-            },
-          })}
+          error={errors.email}
+          style={styles.input}
+          setValue={setValue}
+          register={register}
         />
 
-        <TextInput
-          name="code"
-          disabled={loading}
-          autoComplete="off"
-          autoCapitalize="none"
-          autoCorrect={false}
+        <AuthCodeInput
           autoFocus={true}
-          keyboardType="number-pad"
-          textContentType="oneTimeCode"
-          mode="outlined"
+          label="Verification Code"
+          loading={loading}
           error={errors.code}
-          label="Code"
           style={styles.input}
-          onChangeText={(text) => setValue("code", text)}
-          {...register("code", {
-            required: true,
-            validate: {
-              requiredInput: (value) => value.trim() !== "",
-            },
-          })}
+          setValue={setValue}
+          register={register}
         />
 
         {error !== "" && (

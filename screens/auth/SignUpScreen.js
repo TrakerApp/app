@@ -4,6 +4,7 @@ import { StyleSheet, View } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
 import Title from "../../components/ui/Title";
 import { signUp } from "../../util/auth";
+import { AuthEmailInput } from "./AuthInputs";
 
 const errorMessages = {
   UserAlreadyExists: "The email you entered already exists.",
@@ -52,44 +53,21 @@ export default function SignUpScreen({ navigation }) {
         place!
       </Text>
       <View style={styles.formContainer}>
-        <TextInput
-          name="email"
-          disabled={loading}
-          autoComplete="email"
-          autoCapitalize="none"
-          autoCorrect={false}
+        <AuthEmailInput
           autoFocus={true}
-          keyboardType="email-address"
-          textContentType="emailAddress"
-          mode="outlined"
+          loading={loading}
           error={errors.email}
-          label="Email"
-          placeholder="john@gmail.com"
           style={styles.input}
-          onChangeText={(text) => setValue("email", text)}
-          {...register("email", {
-            required: true,
-            validate: {
-              requiredInput: (value) => value.trim() !== "",
-            },
-          })}
+          setValue={setValue}
+          register={register}
         />
-        <TextInput
-          name="password"
-          disabled={loading}
-          secureTextEntry={true}
-          textContentType="password"
-          mode="outlined"
-          error={errors.password}
+        <AuthPasswordInput
           label="Password"
+          loading={loading}
+          error={errors.password}
           style={styles.input}
-          onChangeText={(text) => setValue("password", text)}
-          {...register("password", {
-            required: true,
-            validate: {
-              requiredInput: (value) => value.trim() !== "",
-            },
-          })}
+          setValue={setValue}
+          register={register}
         />
 
         {error !== "" && (

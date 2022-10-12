@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
-import { Button, Text, TextInput } from "react-native-paper";
+import { Button, Text } from "react-native-paper";
 import Title from "../../components/ui/Title";
 import { forgotPassword, forgotPasswordSubmit } from "../../util/auth";
+import { AuthCodeInput, AuthEmailInput, AuthPasswordInput } from "./AuthInputs";
 
 const errorMessages = {
   UserNotFound: "The email entered does not exist.",
@@ -67,7 +68,10 @@ export default function ForgotPasswordScreen({ navigation, route }) {
     if (res.error) {
       setError(res.error);
     } else {
-      navigation.replace("SignIn", { userEmail: email, successMessage: "Password reset successfully, you can log in now" });
+      navigation.replace("SignIn", {
+        userEmail: email,
+        successMessage: "Password reset successfully, you can log in now",
+      });
     }
     setLoading(false);
   };
@@ -94,73 +98,36 @@ export default function ForgotPasswordScreen({ navigation, route }) {
         password.
       </Text>
       <View style={styles.formContainer}>
-        <TextInput
-          name="email"
-          disabled={loading}
-          autoComplete="email"
-          autoCapitalize="none"
-          autoCorrect={false}
-          autoFocus={true}
+        <AuthEmailInput
+          loading={loading}
           defaultValue={userEmail}
-          keyboardType="email-address"
-          textContentType="emailAddress"
-          mode="outlined"
           error={errors.email}
-          label="Email"
-          placeholder="john@gmail.com"
           style={styles.input}
-          onChangeText={(text) => setValue("email", text)}
-          {...register("email", {
-            required: true,
-            validate: {
-              requiredInput: (value) => value.trim() !== "",
-            },
-          })}
+          setValue={setValue}
+          register={register}
         />
+
         {isReseting && (
           <>
             <Text style={styles.codeHint}>
               You should have received a code in your email, please check, input
               the code below and set your new password.
             </Text>
-            <TextInput
-              name="code"
-              disabled={loading}
-              autoComplete="off"
-              autoCapitalize="none"
-              autoCorrect={false}
-              autoFocus={true}
-              keyboardType="number-pad"
-              textContentType="oneTimeCode"
-              mode="outlined"
-              error={errors.code}
+            <AuthCodeInput
               label="Password Reset Code"
+              loading={loading}
+              error={errors.code}
               style={styles.input}
-              onChangeText={(text) => setValue("code", text)}
-              {...register("code", {
-                required: true,
-                validate: {
-                  requiredInput: (value) => value.trim() !== "",
-                },
-              })}
+              setValue={setValue}
+              register={register}
             />
-
-            <TextInput
-              name="password"
-              disabled={loading}
-              secureTextEntry={true}
-              textContentType="password"
-              mode="outlined"
-              error={errors.password}
+            <AuthPasswordInput
               label="New Password"
+              loading={loading}
+              error={errors.password}
               style={styles.input}
-              onChangeText={(text) => setValue("password", text)}
-              {...register("password", {
-                required: true,
-                validate: {
-                  requiredInput: (value) => value.trim() !== "",
-                },
-              })}
+              setValue={setValue}
+              register={register}
             />
 
             {error !== "" && (

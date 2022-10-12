@@ -25,7 +25,7 @@ export default function SignInScreen({ navigation, route }) {
     if (route?.params?.successMessage) {
       setSuccessMessage(route.params.successMessage);
     }
-  }, [route?.params?.successMessage])
+  }, [route?.params?.successMessage]);
 
   const {
     register,
@@ -75,45 +75,23 @@ export default function SignInScreen({ navigation, route }) {
       <Title style={styles.title}>Sign In</Title>
       <Text style={styles.subtitle}>Welcome back!</Text>
       <View style={styles.formContainer}>
-        <TextInput
-          name="email"
-          disabled={loading}
-          autoComplete="email"
-          autoCapitalize="none"
-          autoCorrect={false}
+        <AuthEmailInput
           autoFocus={true}
-          keyboardType="email-address"
-          textContentType="emailAddress"
-          mode="outlined"
-          error={errors.email}
-          label="Email"
-          placeholder="john@gmail.com"
+          loading={loading}
           defaultValue={userEmail}
+          error={errors.email}
           style={styles.input}
-          onChangeText={(text) => setValue("email", text)}
-          {...register("email", {
-            required: true,
-            validate: {
-              requiredInput: (value) => value.trim() !== "",
-            },
-          })}
+          setValue={setValue}
+          register={register}
         />
-        <TextInput
-          name="password"
-          disabled={loading}
-          secureTextEntry={true}
-          textContentType="password"
-          mode="outlined"
-          error={errors.password}
+
+        <AuthPasswordInput
           label="Password"
+          loading={loading}
+          error={errors.password}
           style={styles.input}
-          onChangeText={(text) => setValue("password", text)}
-          {...register("password", {
-            required: true,
-            validate: {
-              requiredInput: (value) => value.trim() !== "",
-            },
-          })}
+          setValue={setValue}
+          register={register}
         />
 
         {error !== "" && (
