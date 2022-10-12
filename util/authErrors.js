@@ -43,12 +43,22 @@ const ERROR_MATCHES = [
     match: /CodeMismatchException/,
     error: "InvalidCode",
   },
+  {
+    match: /UserNotFoundException/,
+    error: "UserNotFound",
+  },
+  {
+    match: /The.user.is.not.authenticated/,
+    error: "NotAuthenticated",
+  },
 ];
 
-export const getAuthErrorMessage = ({
-  error,
-  defaultError = "ServerError",
-}) => {
+export const getAuthErrorMessage = (error, defaultError = "ServerError") => {
+  if (!error) {
+    console.log("not error:", error);
+    return null;
+  }
+
   const match = ERROR_MATCHES.find(({ match }) =>
     error.toString().match(match)
   );
