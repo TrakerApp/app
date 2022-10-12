@@ -1,19 +1,15 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
-import { Button, Text, TextInput } from "react-native-paper";
+import { Button, Text } from "react-native-paper";
 import Title from "../../components/ui/Title";
 import { signUp } from "../../util/auth";
 import { AuthEmailInput } from "./AuthInputs";
-
-const errorMessages = {
-  UserAlreadyExists: "The email you entered already exists.",
-  ServerError: "There was an error signing in, please try again.",
-};
+import { useAuthErrorHook } from "./useAuthErrorHook";
 
 export default function SignUpScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [setError, AuthErrorComponent] = useAuthErrorHook()
 
   const {
     register,
@@ -70,9 +66,7 @@ export default function SignUpScreen({ navigation }) {
           register={register}
         />
 
-        {error !== "" && (
-          <Text style={styles.error}>{errorMessages[error]}</Text>
-        )}
+       <AuthErrorComponent/>
 
         <Button
           style={styles.outlinedButton}
@@ -108,11 +102,6 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     fontSize: 20,
     textAlign: "center",
-  },
-  error: {
-    color: "red",
-    textAlign: "center",
-    paddingTop: 10,
   },
   formContainer: {
     paddingTop: 20,

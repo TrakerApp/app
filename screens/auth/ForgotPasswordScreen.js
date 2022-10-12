@@ -6,22 +6,9 @@ import Title from "../../components/ui/Title";
 import { forgotPassword, forgotPasswordSubmit } from "../../util/auth";
 import { AuthCodeInput, AuthEmailInput, AuthPasswordInput } from "./AuthInputs";
 
-const errorMessages = {
-  UserNotFound: "The email entered does not exist.",
-  UserNotConfirmed:
-    "The email entered has not been confirmed yet, please check your email and confirm it.",
-  CouldNotSendCode: "There was an error sending the code, please try again.",
-  PasswordNotLongEnough: "Password length must be at least 6 characters.",
-  InvalidCode: "The code introduced is invalid.",
-  ExpiredCode: "The code introduced is expired, request a new one.",
-  LimitExceeded: "You are requesting too many codes, please try again later.",
-  CouldNotSetNewPassword: "There was an error setting the new password.",
-  ServerError: "There was an error sending the code, please try again.",
-};
-
 export default function ForgotPasswordScreen({ navigation, route }) {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [setError, AuthErrorComponent] = useAuthErrorHook();
   const [successMessage, setSuccessMessage] = useState("");
   const [isReseting, setIsReseting] = useState(true);
   const userEmail = route?.params?.userEmail || "";
@@ -130,9 +117,7 @@ export default function ForgotPasswordScreen({ navigation, route }) {
               register={register}
             />
 
-            {error !== "" && (
-              <Text style={styles.error}>{errorMessages[error]}</Text>
-            )}
+            <AuthErrorComponent />
 
             <Button
               mode="outlined"
@@ -160,9 +145,7 @@ export default function ForgotPasswordScreen({ navigation, route }) {
         )}
         {!isReseting && (
           <>
-            {error !== "" && (
-              <Text style={styles.error}>{errorMessages[error]}</Text>
-            )}
+            <AuthErrorComponent />
 
             <Button
               mode="outlined"
@@ -209,11 +192,6 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     fontSize: 20,
     textAlign: "center",
-  },
-  error: {
-    color: "red",
-    textAlign: "center",
-    paddingTop: 10,
   },
   success: {
     color: "green",

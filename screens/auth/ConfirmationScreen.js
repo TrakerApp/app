@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
-import { Button, Text, TextInput } from "react-native-paper";
+import { Button, Text } from "react-native-paper";
 import Title from "../../components/ui/Title";
 import { useAuthContext } from "../../store/context/auth-context";
 import {
@@ -10,19 +10,8 @@ import {
   listenToAutoSignIn,
 } from "../../util/auth";
 
-const errorMessages = {
-  InvalidCode: "The code is invalid.",
-  UserNotFound: "The email introduced was not found.",
-  CouldNotConfirm:
-    "There was an error confirming your account, please try again.",
-  UserAlreadyConfirmed: "The account is already confirmed.",
-  UserNotFound: "The email introduced was not found.",
-  CouldNotResendCode:
-    "There was an error resending the code, please try again.",
-};
-
 export default function ConfirmationScreen({ navigation, route }) {
-  const [error, setError] = useState(null);
+  const [setError, AuthErrorComponent] = useAuthErrorHook();
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const authContext = useAuthContext();
@@ -132,9 +121,8 @@ export default function ConfirmationScreen({ navigation, route }) {
           register={register}
         />
 
-        {error !== "" && (
-          <Text style={styles.error}>{errorMessages[error]}</Text>
-        )}
+        <AuthErrorComponent />
+
         {successMessage !== "" && (
           <Text style={styles.success}>{successMessage}</Text>
         )}

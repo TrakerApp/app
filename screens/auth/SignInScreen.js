@@ -1,22 +1,14 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { StyleSheet, View } from "react-native";
-import { Button, Text, TextInput } from "react-native-paper";
+import { Button, Text } from "react-native-paper";
 import Title from "../../components/ui/Title";
 import { useAuthContext } from "../../store/context/auth-context";
 import { signIn } from "../../util/auth";
 
-const errorMessages = {
-  UserDoesNotExist: "Email or password is incorrect.",
-  IncorrectCredentials: "Email or password is incorrect.",
-  UserNotConfirmed:
-    "The email entered has not been confirmed yet, please check your email and confirm it.",
-  ServerError: "There was an error signing in, please try again.",
-};
-
 export default function SignInScreen({ navigation, route }) {
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [setError, AuthErrorComponent] = useAuthErrorHook();
   const [successMessage, setSuccessMessage] = useState("");
   const authContext = useAuthContext();
   const userEmail = route?.params?.userEmail || "";
@@ -94,9 +86,7 @@ export default function SignInScreen({ navigation, route }) {
           register={register}
         />
 
-        {error !== "" && (
-          <Text style={styles.error}>{errorMessages[error]}</Text>
-        )}
+        <AuthErrorComponent />
         {successMessage !== "" && (
           <Text style={styles.success}>{successMessage}</Text>
         )}
@@ -151,11 +141,6 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     fontSize: 20,
     textAlign: "center",
-  },
-  error: {
-    color: "red",
-    textAlign: "center",
-    paddingTop: 10,
   },
   success: {
     color: "green",
