@@ -2,6 +2,7 @@
 // https://docs.amplify.aws/lib/auth/start/q/platform/js/#create-new-authentication-resource
 import { Amplify, Auth, Hub } from "aws-amplify";
 import { COGNITO_POOL_ID, COGNITO_CLIENT_ID } from "@env";
+import { getAuthErrorMessage } from "./authErrors";
 
 Amplify.configure({
   Auth: {
@@ -75,7 +76,7 @@ const extractUser = (data) => {
 
 export const signUp = async (email, password) => {
   try {
-    const response = await Auth.signUp({
+    return await Auth.signUp({
       username: email,
       password,
       attributes: {
@@ -89,73 +90,42 @@ export const signUp = async (email, password) => {
       },
     });
     // RESPONSE: {"user":{"username":"carlosr706+1@gmail.com","pool":{"userPoolId":"us-east-1_W0a2h5L0s","clientId":"3c689eqc0nhl7cansolh5bnr7o","client":{"endpoint":"https://cognito-idp.us-east-1.amazonaws.com/","fetchOptions":{}},"advancedSecurityDataCollectionFlag":true},"Session":null,"client":{"endpoint":"https://cognito-idp.us-east-1.amazonaws.com/","fetchOptions":{}},"signInUserSession":null,"authenticationFlowType":"USER_SRP_AUTH","keyPrefix":"CognitoIdentityServiceProvider.3c689eqc0nhl7cansolh5bnr7o","userDataKey":"CognitoIdentityServiceProvider.3c689eqc0nhl7cansolh5bnr7o.carlosr706+1@gmail.com.userData"},"userConfirmed":false,"userSub":"d81bdc27-0153-4131-914b-438ca6a66af9","codeDeliveryDetails":{"AttributeName":"email","DeliveryMedium":"EMAIL","Destination":"c***@g***"}}
-    return response;
   } catch (error) {
     console.log("error signing up:", error);
     // throw error;
     return {
-      error: error.toString().match(/User.already.exists/)
-        ? "UserAlreadyExists"
-        : "ServerError",
+      error: getAuthErrorMessage(error),
     };
   }
 };
 
 export const confirmSignUp = async (email, code) => {
   try {
-    const response = await Auth.confirmSignUp(email, code);
-    // response: SUCCESS
-    return response;
+    return await Auth.confirmSignUp(email, code);
   } catch (error) {
     console.log("error confirming sign up:", error);
-    if (error.toString().match(/CodeMismatchException/)) {
-      return { error: "InvalidVerificationCode" };
-    }
-    if (error.toString().match(/UserNotFoundException/)) {
-      return { error: "UserNotFound" };
-    }
-    return { error: "CouldNotConfirm" };
+
+    return { error: getAuthErrorMessage(error, "CouldNotConfirm") };
   }
 };
 
 export const resendConfirmationCode = async (email) => {
   try {
-    const res = await Auth.resendSignUp(email);
-    console.log("code resent successfully");
-    return res;
-  } catch (err) {
+    return await Auth.resendSignUp(email);
+  } catch (error) {
     console.log("error resending code: ", err);
-    if (err.toString().match(/User.is.already.confirmed/)) {
-      return { error: "UserAlreadyConfirmed" };
-    }
-    if (err.toString().match(/UserNotFoundException/)) {
-      return { error: "UserNotFound" };
-    }
-    return { error: "CouldNotResendCode" };
+
+    return { error: getAuthErrorMessage(error, "CouldNotResendCode") };
   }
 };
 
 export const signIn = async (email, password) => {
   try {
-    const res = await Auth.signIn(email, password);
-
-    return extractUser(res);
+    return await Auth.signIn(email, password);
   } catch (error) {
     console.log("error signing in", error);
 
-    if (error.toString().match(/User.does.not.exist/)) {
-      return { error: "UserDoesNotExist" };
-    }
-
-    if (error.toString().match(/Incorrect.username.or.password/)) {
-      return { error: "IncorrectCredentials" };
-    }
-
-    if (error.toString().match(/User.is.not.confirmed/)) {
-      return { error: "UserNotConfirmed" };
-    }
-
-    return { error: "ServerError" };
+    return { error: getAuthErrorMessage(error) };
   }
 };
 
@@ -164,14 +134,16 @@ export const signOut = async () => {
     return await Auth.signOut();
   } catch (error) {
     console.log("error signing out: ", error);
+    return { error: getAuthErrorMessage(error) };
   }
 };
 
 export const globalSignOut = async () => {
   try {
-    await Auth.signOut({ global: true });
+    return await Auth.signOut({ global: true });
   } catch (error) {
     console.log("error signing out globally: ", error);
+    return { error: getAuthErrorMessage(error) };
   }
 };
 
@@ -184,11 +156,17 @@ export const listenToAutoSignIn = () => {
           resolve(extractUser(payload.data));
         } else if (event === "autoSignIn_failure") {
           console.log("auto sign in failed!payload.data:", payload.data);
-          resolve({ error: "AutoSignInFailed" });
+          resolve({
+            error: getAuthErrorMessage(
+              payload.data.toString(),
+              "AutoSignInFailed"
+            ),
+          });
         }
       });
     } catch (error) {
       console.log("ERROR IN THE HUB.LISTEN CODE!  error:", error);
+      resolve({ error: getAuthErrorMessage(error, "AutoSignInFailed") });
     }
   });
 };
@@ -202,13 +180,15 @@ export const currentAuthenticatedUser = ({ bypassCache = false }) => {
         .then((data) => {
           resolve(extractUser(data));
         })
-        .catch((data) => {
-          console.log("error getting current authenticated user:", data);
-          resolve({ error: "NotAuthenticated" });
+        .catch((error) => {
+          console.log("error getting current authenticated user:", error);
+
+          resolve({ error: getAuthErrorMessage(error, "NotAuthenticated") });
         });
     } catch (error) {
       console.log("error getting current user: ", error);
-      reject(error);
+
+      resolve({ error: getAuthErrorMessage(error, "NotAuthenticated") });
     }
   });
 };
@@ -217,64 +197,38 @@ export const forgotPassword = (email) => {
   return new Promise((resolve, reject) => {
     try {
       Auth.forgotPassword(email)
-        .then(data => resolve(data))
-        .catch(error => {
-          console.log("ERROR on forgotPassword .catch:", error)
+        .then((data) => resolve(data))
+        .catch((error) => {
+          console.log("ERROR on forgotPassword .catch:", error);
 
-          if (error.toString().match(/UserNotFoundException/)) {
-            resolve({ error: "UserNotFound" });
-          }
-
-          if (error.toString().match(/InvalidParameterException/)) {
-            resolve({ error: "UserNotConfirmed" });
-          }
-
-          if (error.toString().match(/LimitExceededException/)) {
-            resolve({ error: "LimitExceeded" });
-          }
-
-          resolve({ error: "CouldNotSendCode" })
+          resolve({ error: getAuthErrorMessage(error, "CouldNotSendCode") });
         });
     } catch (error) {
       console.log("error sending forgot password code: ", error);
-      resolve({ error: "ServerError" })
+
+      resolve({ error: getAuthErrorMessage(error, "CouldNotSendCode") });
     }
   });
-}
+};
 
 export const forgotPasswordSubmit = (email, code, newPassword) => {
   return new Promise((resolve, reject) => {
     try {
       Auth.forgotPasswordSubmit(email, code, newPassword)
-        .then(data => resolve(data))
-        .catch(error => {
-          console.log("ERROR on forgotPassword .catch:", error)
+        .then((data) => resolve(data))
+        .catch((error) => {
+          console.log("ERROR on forgotPassword .catch:", error);
 
-          if (error.toString().match(/Password.not.long.enough/)) {
-            resolve({ error: "PasswordNotLongEnough" });
-          }
-
-          if (error.toString().match(/ExpiredCodeException/)) {
-            resolve({ error: "ExpiredCode" });
-          }
-
-          if (error.toString().match(/CodeMismatchException/)) {
-            resolve({ error: "InvalidCode" });
-          }
-
-          if (error.toString().match(/UserNotFoundException/)) {
-            resolve({ error: "UserNotFound" });
-          }
-
-          if (error.toString().match(/LimitExceededException/)) {
-            resolve({ error: "LimitExceeded" });
-          }
-
-          resolve({ error: "CouldNotSetNewPassword" })
+          resolve({
+            error: getAuthErrorMessage(error, "CouldNotSetNewPassword"),
+          });
         });
     } catch (error) {
-      console.log("error sending setting new password on forgot password: ", error);
-      resolve({ error: "ServerError" })
+      console.log(
+        "error sending setting new password on forgot password: ",
+        error
+      );
+      resolve({ error: getAuthErrorMessage(error, "ServerError") });
     }
   });
-}
+};

@@ -11,7 +11,7 @@ import {
 } from "../../util/auth";
 
 const errorMessages = {
-  InvalidVerificationCode: "The verification code is invalid.",
+  InvalidCode: "The code is invalid.",
   UserNotFound: "The email introduced was not found.",
   CouldNotConfirm:
     "There was an error confirming your account, please try again.",
