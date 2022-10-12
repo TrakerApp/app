@@ -66,7 +66,9 @@ Amplify.configure({
   },
 });
 
-const extractUser = (data) => {
+export const extractUser = (data) => {
+  if (data.email && data.sub && data.accessToken) { return data }
+
   return {
     email: data.attributes.email,
     sub: data.attributes.sub,
@@ -121,7 +123,9 @@ export const resendConfirmationCode = async (email) => {
 
 export const signIn = async (email, password) => {
   try {
-    return await Auth.signIn(email, password);
+    const user = await Auth.signIn(email, password);
+
+    return extractUser(user);
   } catch (error) {
     console.log("error signing in", error);
 
@@ -158,7 +162,7 @@ export const listenToAutoSignIn = () => {
           console.log("auto sign in failed!payload.data:", payload.data);
           resolve({
             error: getAuthErrorMessage(
-              payload.data.toString(),
+              payload.data?.toString(),
               "AutoSignInFailed"
             ),
           });

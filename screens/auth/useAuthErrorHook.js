@@ -23,6 +23,7 @@ const errorMessages = {
   UserAlreadyExists: "The email you entered already exists.",
   UserDoesNotExist: "Email or password is incorrect.",
   IncorrectCredentials: "Email or password is incorrect.",
+  InvalidEmailFormat: "The email you entered is not valid.",
 };
 
 const AuthErrorText = (error) => {

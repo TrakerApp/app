@@ -20,12 +20,12 @@ const ERROR_MATCHES = [
     error: "IncorrectCredentials",
   },
   {
-    match: /User.is.not.confirmed/,
+    match: /UserNotConfirmedException/,
     error: "UserNotConfirmed",
   },
   {
-    match: /InvalidParameterException/,
-    error: "UserNotConfirmed",
+    match: /Invalid.email.address.format/,
+    error: "InvalidEmailFormat",
   },
   {
     match: /LimitExceededException/,
@@ -51,11 +51,14 @@ const ERROR_MATCHES = [
     match: /The.user.is.not.authenticated/,
     error: "NotAuthenticated",
   },
+  {
+    match: /there.is.no.registered\/verified.email.or.phone_number/,
+    error: "UserNotConfirmed",
+  },
 ];
 
 export const getAuthErrorMessage = (error, defaultError = "ServerError") => {
   if (!error) {
-    console.log("not error:", error);
     return null;
   }
 

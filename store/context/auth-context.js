@@ -1,6 +1,6 @@
 import { useContext, useEffect } from "react";
 import { createContext, useState } from "react";
-import { currentAuthenticatedUser, signOut } from "../../util/auth";
+import { currentAuthenticatedUser, extractUser, signOut } from "../../util/auth";
 
 export const AuthContext = createContext({
   isAuthenticated: false,
@@ -19,15 +19,15 @@ export default function AuthContextProvider({ children }) {
   const [isFirstTime, setIsFirstTime] = useState(false); // TODO: TK-28
 
   const callSignIn = (user) => {
-    setCurrentUser(user);
+    setCurrentUser(extractUser(user));
     setIsAuthenticated(true);
   };
 
   const callSignOut = () => {
     signOut()
       .then((res) => {
-        setIsAuthenticated(false);
         setCurrentUser(null);
+        setIsAuthenticated(false);
       })
       .catch((err) => {
         console.log("ERROR ON SIGN OUT:", err);
