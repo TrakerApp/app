@@ -5,12 +5,13 @@ import { Button, Text } from "react-native-paper";
 import Title from "../../components/ui/Title";
 import { forgotPassword, forgotPasswordSubmit } from "../../util/auth";
 import { AuthCodeInput, AuthEmailInput, AuthPasswordInput } from "./AuthInputs";
+import { useAuthErrorHook } from "./useAuthErrorHook";
 
 export default function ForgotPasswordScreen({ navigation, route }) {
   const [loading, setLoading] = useState(false);
   const [setError, AuthErrorComponent] = useAuthErrorHook();
   const [successMessage, setSuccessMessage] = useState("");
-  const [isReseting, setIsReseting] = useState(true);
+  const [isReseting, setIsReseting] = useState(false);
   const userEmail = route?.params?.userEmail || "";
 
   const {

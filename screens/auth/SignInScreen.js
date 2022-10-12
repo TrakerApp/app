@@ -5,6 +5,8 @@ import { Button, Text } from "react-native-paper";
 import Title from "../../components/ui/Title";
 import { useAuthContext } from "../../store/context/auth-context";
 import { signIn } from "../../util/auth";
+import { useAuthErrorHook } from "./useAuthErrorHook";
+import { AuthEmailInput, AuthPasswordInput } from "./AuthInputs";
 
 export default function SignInScreen({ navigation, route }) {
   const [loading, setLoading] = useState(false);

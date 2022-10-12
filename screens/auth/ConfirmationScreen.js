@@ -4,6 +4,8 @@ import { StyleSheet, View } from "react-native";
 import { Button, Text } from "react-native-paper";
 import Title from "../../components/ui/Title";
 import { useAuthContext } from "../../store/context/auth-context";
+import { useAuthErrorHook } from "./useAuthErrorHook";
+import { AuthEmailInput, AuthCodeInput } from "./AuthInputs";
 import {
   confirmSignUp,
   resendConfirmationCode,

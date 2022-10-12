@@ -1,6 +1,8 @@
 // custom hook for errors
-
 import { StyleSheet } from "react-native";
+import { useState } from "react";
+
+import { Text } from "react-native-paper";
 
 const errorMessages = {
   InvalidCode: "The code entered is invalid.",
@@ -32,9 +34,9 @@ const AuthErrorText = (error) => {
 };
 
 export const useAuthErrorHook = () => {
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
 
-  return [setError, AuthErrorText(error)];
+  return [setError, () => { return AuthErrorText(error) }];
 };
 
 const styles = StyleSheet.create({

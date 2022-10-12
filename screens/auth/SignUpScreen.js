@@ -4,7 +4,7 @@ import { StyleSheet, View } from "react-native";
 import { Button, Text } from "react-native-paper";
 import Title from "../../components/ui/Title";
 import { signUp } from "../../util/auth";
-import { AuthEmailInput } from "./AuthInputs";
+import { AuthEmailInput, AuthPasswordInput } from "./AuthInputs";
 import { useAuthErrorHook } from "./useAuthErrorHook";
 
 export default function SignUpScreen({ navigation }) {
