@@ -115,7 +115,7 @@ export const resendConfirmationCode = async (email) => {
   try {
     return await Auth.resendSignUp(email);
   } catch (error) {
-    console.log("error resending code: ", err);
+    console.log("error resending code: ", error);
 
     return { error: getAuthErrorMessage(error, "CouldNotResendCode") };
   }

@@ -75,6 +75,7 @@ export function AuthPasswordInput({
 }
 
 export function AuthCodeInput({
+  autoFocus = false,
   label,
   loading,
   style,
@@ -89,7 +90,7 @@ export function AuthCodeInput({
       autoComplete="off"
       autoCapitalize="none"
       autoCorrect={false}
-      autoFocus={true}
+      autoFocus={autoFocus}
       keyboardType="number-pad"
       textContentType="oneTimeCode"
       mode="outlined"

@@ -24,6 +24,7 @@ export default function ConfirmationScreen({ navigation, route }) {
     setValue,
     handleSubmit,
     getValues,
+    setError: setFormError,
     formState: { errors },
   } = useForm({
     defaultValues: { email: userEmail, code: "" }, // TODO: TK-29
@@ -54,12 +55,16 @@ export default function ConfirmationScreen({ navigation, route }) {
     setError("");
     setSuccessMessage("");
     const email = getValues("email");
-    const res = await resendConfirmationCode(email);
-    if (res.error) {
-      setError(res.error);
+    if (email === "") {
+      setFormError("email", { type: "required", message: "Email is required" });
     } else {
-      setSuccessMessage("Code resent successfully");
-      console.log("resending res:", res);
+      const res = await resendConfirmationCode(email);
+      if (res.error) {
+        setError(res.error);
+      } else {
+        setSuccessMessage("Code resent successfully");
+        console.log("resending res:", res);
+      }
     }
     setLoading(false);
   };
@@ -105,6 +110,7 @@ export default function ConfirmationScreen({ navigation, route }) {
       </Text>
       <View style={styles.formContainer}>
         <AuthEmailInput
+          autoFocus={userEmail === ""}
           loading={loading}
           defaultValue={userEmail}
           error={errors.email}
@@ -114,7 +120,7 @@ export default function ConfirmationScreen({ navigation, route }) {
         />
 
         <AuthCodeInput
-          autoFocus={true}
+          autoFocus={userEmail !== ""}
           label="Verification Code"
           loading={loading}
           error={errors.code}

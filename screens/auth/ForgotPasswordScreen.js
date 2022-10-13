@@ -18,6 +18,7 @@ export default function ForgotPasswordScreen({ navigation, route }) {
     register,
     setValue,
     getValues,
+    setError: setFormError,
     handleSubmit,
     formState: { errors },
   } = useForm({
@@ -68,12 +69,17 @@ export default function ForgotPasswordScreen({ navigation, route }) {
     setLoading(true);
     setError("");
     setSuccessMessage("");
-    const res = await forgotPassword(getValues("email"));
-    if (res.error) {
-      setError(res.error);
+    const email = getValues("email")
+    if (email === '') {
+      setFormError('email', { type: 'required', message: 'Email is required' })
     } else {
-      setSuccessMessage("Code resent successfully");
-      console.log("resending res:", res);
+      const res = await forgotPassword();
+      if (res.error) {
+        setError(res.error);
+      } else {
+        setSuccessMessage("Code resent successfully");
+        console.log("resending res:", res);
+      }
     }
     setLoading(false);
   };
@@ -87,6 +93,7 @@ export default function ForgotPasswordScreen({ navigation, route }) {
       </Text>
       <View style={styles.formContainer}>
         <AuthEmailInput
+          autoFocus={true}
           loading={loading}
           defaultValue={userEmail}
           error={errors.email}
@@ -103,6 +110,7 @@ export default function ForgotPasswordScreen({ navigation, route }) {
             </Text>
             <AuthCodeInput
               label="Password Reset Code"
+              autoFocus={true}
               loading={loading}
               error={errors.code}
               style={styles.input}
