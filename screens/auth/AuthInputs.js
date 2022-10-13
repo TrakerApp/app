@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { TextInput } from "react-native-paper";
 
 export function AuthEmailInput({
@@ -23,6 +24,7 @@ export function AuthEmailInput({
       mode="outlined"
       error={error}
       label="Email"
+      left={<TextInput.Icon name="at" />}
       placeholder="john@gmail.com"
       style={style}
       onChangeText={(text) => setValue("email", text)}
@@ -44,17 +46,24 @@ export function AuthPasswordInput({
   setValue,
   register,
 }) {
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleEyePress = () => {
+    setShowPassword((prev) => !prev);
+  };
   return (
     <TextInput
       name="password"
       disabled={loading}
-      secureTextEntry={true}
+      secureTextEntry={!showPassword}
       textContentType="password"
       mode="outlined"
       error={error}
       label={label}
       style={style}
+      left={<TextInput.Icon name="form-textbox-password" />}
       onChangeText={(text) => setValue("password", text)}
+      right={<TextInput.Icon name="eye" onPress={handleEyePress} />}
       {...register("password", {
         required: true,
         validate: {
@@ -87,6 +96,7 @@ export function AuthCodeInput({
       error={error}
       label={label}
       style={style}
+      left={<TextInput.Icon name="email" />}
       onChangeText={(text) => setValue("code", text)}
       {...register("code", {
         required: true,
