@@ -67,8 +67,11 @@ Amplify.configure({
 });
 
 export const extractUser = (data) => {
-  if (data.email && data.sub && data.accessToken) { return data }
+  if (data.email && data.sub && data.accessToken) {
+    return data;
+  }
 
+  // Note: here we also have idToken and refreshToken
   return {
     email: data.attributes.email,
     sub: data.attributes.sub,
@@ -79,10 +82,10 @@ export const extractUser = (data) => {
 export const signUp = async (email, password) => {
   try {
     return await Auth.signUp({
-      username: email,
+      username: email.toLowerCase(),
       password,
       attributes: {
-        email, // optional
+        email: email.toLowerCase(), // optional
         // phone_number, // optional - E.164 number convention
         // other custom attributes
       },
