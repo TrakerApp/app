@@ -1,6 +1,5 @@
 import axios from "axios";
-const BASE_API_URL =
-  "https://bkk0p8ol4k.execute-api.us-east-1.amazonaws.com/api/v1";
+const BASE_API_URL = `${process.env.API_URL}/api/v1`;
 
 const makeRequest = ({ path, data = {}, token, method }) => {
   if (method === "get") {
@@ -51,7 +50,10 @@ export const listTrackings = async (token, { page = 1, perPage = 10 }) => {
   });
 };
 
-export const occurrences = async (token, { trackingId, page = 1, perPage = 10 }) => {
+export const occurrences = async (
+  token,
+  { trackingId, page = 1, perPage = 10 }
+) => {
   return await makeRequest({
     method: "get",
     path: `trackings/${trackingId}/occurrences`,
