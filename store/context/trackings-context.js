@@ -40,12 +40,16 @@ export default function TrackingsContextProvider({ children }) {
   };
 
   const track = async ({ trackingId }) => {
-    return await trackingsApi.track({ trackingId });
-    // setTrackings((trackings) => {
-    //   const tracking = trackings.find((t) => t.id === id);
-    //   tracking.track();
-    //   return [...trackings];
-    // });
+    const res = await trackingsApi.track({ trackingId });
+    if (res.status === 201) {
+      setTrackings((trackings) => {
+        const tracking = trackings.find((t) => t.trackingId === trackingId);
+        tracking.lastOccurrenceAt = res.data.lastOccurrenceAt;
+        return [...trackings];
+      });
+    }
+
+    return res
   };
 
   const listTrackings = async ({ page = 1, perPage = 10 }) => {

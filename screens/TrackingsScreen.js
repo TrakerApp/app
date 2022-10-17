@@ -39,7 +39,7 @@ function TrackingListItemSwipeable({ onSwipeRight, item }) {
       <TrackingListItem
         trackingId={item.trackingId}
         name={item.name}
-        lastOccurrenceTime={item.lastOccurrenceTime}
+        lastOccurrenceAt={item.lastOccurrenceAt}
       />
     </Swipeable>
   );
