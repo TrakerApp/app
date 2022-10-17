@@ -114,6 +114,16 @@ export const confirmSignUp = async (email, code) => {
   }
 };
 
+export const currentSession = async () => {
+  try {
+    return await Auth.currentSession();
+  } catch (error) {
+    console.log("error on auth getting currentSession:", error);
+
+    return { error: getAuthErrorMessage(error, "CouldNotFetchSession") };
+  }
+};
+
 export const resendConfirmationCode = async (email) => {
   try {
     return await Auth.resendSignUp(email);
