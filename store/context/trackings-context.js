@@ -16,7 +16,7 @@ export default function TrackingsContextProvider({ children }) {
   const [trackings, setTrackings] = useState([]);
   const authCtx = useAuthContext();
 
-  const trackingsApi = new TrackingsApi(authCtx.currentUser.accessToken);
+  const trackingsApi = new TrackingsApi(authCtx.accessToken);
 
   const addTracking = async ({ name }) => {
     const newTracking = await trackingsApi.createTracking({ name });

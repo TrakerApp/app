@@ -67,15 +67,17 @@ Amplify.configure({
 });
 
 export const extractUser = (data) => {
+  // "data" is an object that is returned by Auth, it has it's own methods, it's not a simple object
   if (data.email && data.sub && data.accessToken) {
     return data;
   }
 
-  // Note: here we also have idToken and refreshToken
   return {
     email: data.attributes.email,
     sub: data.attributes.sub,
     accessToken: data.signInUserSession.accessToken.jwtToken,
+    idToken: data.signInUserSession.idToken.jwtToken,
+    refreshSession: data.refreshSession,
   };
 };
 

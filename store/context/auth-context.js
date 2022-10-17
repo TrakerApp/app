@@ -13,17 +13,20 @@ export const AuthContext = createContext({
   checkIfUserIsAuthenticated: async () => {},
   signIn: () => {},
   signOut: () => {},
+  accessToken: null,
 });
 
 export const useAuthContext = () => useContext(AuthContext);
 
 export default function AuthContextProvider({ children }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [accessToken, setAccessToken] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [isFirstTime, setIsFirstTime] = useState(false); // TODO: TK-28
 
   const callSignIn = (user) => {
     setCurrentUser(extractUser(user));
+    setAccessToken(user.accessToken)
     setIsAuthenticated(true);
   };
 
@@ -60,6 +63,7 @@ export default function AuthContextProvider({ children }) {
         isAuthenticated,
         isFirstTime,
         currentUser,
+        accessToken,
         signIn: callSignIn,
         signOut: callSignOut,
         checkIfUserIsAuthenticated,
