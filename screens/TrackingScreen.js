@@ -5,12 +5,18 @@ import { TrackingsContext } from "../store/context/trackings-context";
 import useColors from "../util/hooks/useColors";
 import TrackingForm from "../components/TrackingForm";
 
+const getPluralSingular = (count, singular, plural) => {
+  const text = count === 1 ? singular : plural;
+  return `${count} ${text}`;
+};
+
 export default function TrackingScreen({ navigation, route }) {
   const trackingsCtx = useContext(TrackingsContext);
   const [tracking, setTracking] = useState(null);
+  const [occurrences, setOccurrences] = useState([]);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const colors = useColors();
-  const { id } = route.params;
+  const { trackingId } = route.params;
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -28,30 +34,60 @@ export default function TrackingScreen({ navigation, route }) {
 
   useEffect(() => {
     const fetchTracking = async () => {
-      const tracking = await trackingsCtx.findTracking(id);
-      setTracking(tracking);
+      const { status, data } = await trackingsCtx.findTracking(trackingId);
+      if (status === 200) {
+        setTracking(data);
+      }
     };
 
+    const fetchOccurrences = async () => {
+      const { status, data } = await trackingsCtx.listOccurrences({
+        trackingId,
+        page: 1,
+        perPage: 10,
+      });
+      if (status === 200) {
+        console.log("OCCURRENCES DATA: data", data);
+        setOccurrences(data.occurrences);
+      } else {
+        console.log("error on fetch occurrences:", status, data)
+      }
+    }
+
     fetchTracking();
-  }, [id]);
+    fetchOccurrences();
+  }, [trackingId]);
 
   if (!tracking) {
     return <Text>Loading...</Text>;
   }
 
-  const handleTrack = () => {
-    trackingsCtx.track(tracking);
+  const handleTrack = async () => {
+    const { status, data } = await trackingsCtx.track({
+      trackingId: trackingId,
+    });
+    console.log("status, data is", status, data);
+    if (status === 201) {
+      setTracking({
+        ...tracking,
+        todayOccurrences: tracking.todayOccurrences + 1,
+        weekOccurrences: tracking.weekOccurrences + 1,
+      });
+
+      // NOTE: WE WILL CHANGE lastOccurrenceAt -> createdAt
+      setOccurrences((prevOccurrences) => [{ occurrenceId: data.occurrenceId, createdAt: data.lastOccurrenceAt }, ...prevOccurrences]);
+    }
   };
 
   const showModal = () => setEditModalVisible(true);
   const hideModal = () => setEditModalVisible(false);
 
   const handleSaveName = ({ name }) => {
-    trackingsCtx.editTracking({ id, name });
+    trackingsCtx.editTracking({ trackingId, name });
     hideModal();
   };
 
-  const hasOccurrences = tracking.occurrences?.length > 0;
+  const hasOccurrences = occurrences.length > 0;
 
   return (
     <View style={styles.rootContainer}>
@@ -77,20 +113,29 @@ export default function TrackingScreen({ navigation, route }) {
           Track
         </Button>
       </View>
-      {/* TODO: Make this work
       <View style={styles.infoContainer}>
-        <Text style={styles.info}>Today: 1 time</Text>
-        <Text style={styles.info}>This week: 3 times</Text>
-      </View> */}
+        <View>
+          <Text style={[styles.infoTitle, styles.info]}>Today</Text>
+          <Text style={styles.info}>
+            {getPluralSingular(tracking.todayOccurrences, "time", "times")}
+          </Text>
+        </View>
+        <View>
+          <Text style={[styles.infoTitle, styles.info]}>This week</Text>
+          <Text style={styles.info}>
+            {getPluralSingular(tracking.weekOccurrences, "time", "times")}
+          </Text>
+        </View>
+      </View>
       <View style={styles.historyContainer}>
         <Text style={styles.subtitle}>History</Text>
         <Text style={[styles.helpText, { color: colors.helpText }]}>
           Swipe left to remove an occurrence
         </Text>
         {hasOccurrences &&
-          tracking.occurrences.map((occurrence) => (
-            <Text key={occurrence.id} style={styles.occurrence}>
-              {occurrence.time.toString()}
+          occurrences.map((occurrence) => (
+            <Text key={occurrence.occurrenceId} style={styles.occurrence}>
+              {occurrence.createdAt.toString()}
             </Text>
           ))}
         {!hasOccurrences && (
@@ -113,16 +158,21 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
   },
   infoContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
     marginTop: 10,
-    paddingLeft: 20,
   },
   historyContainer: {
     marginLeft: 20,
     marginTop: 20,
   },
+  infoTitle: {
+    fontWeight: "bold",
+  },
   info: {
     fontSize: 20,
     marginTop: 10,
+    textAlign: "center",
   },
   button: {
     paddingHorizontal: 28,

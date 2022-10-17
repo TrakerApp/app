@@ -61,6 +61,7 @@ export default class TrackingsApi {
   }
 
   async track({ trackingId }) {
+    console.log("track:", trackingId)
     return await this.makeRequest({
       method: "post",
       path: `trackings/${trackingId}/track`,

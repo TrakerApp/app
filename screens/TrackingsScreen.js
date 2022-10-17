@@ -104,7 +104,7 @@ export default function TrackingsScreen({ navigation }) {
       <FlatList
         style={styles.listContainer}
         data={trackingsCtx.trackings}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.trackingId}
         renderItem={({ item }) => (
           <TrackingListItemSwipeable
             onSwipeRight={handleTracking}

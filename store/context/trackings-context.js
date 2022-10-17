@@ -7,9 +7,10 @@ export const TrackingsContext = createContext({
   trackings: [],
   addTracking: async ({ name }) => {},
   editTracking: async ({ id, name }) => {},
-  track: async ({ id }) => {},
+  track: async ({ trackingId }) => {},
   listTrackings: async ({ page, perPage }) => {},
-  findTracking: async (id) => {},
+  findTracking: async (trackingId) => {},
+  listOccurrences: async ({ trackingId, page, perPage }) => {}
 });
 
 export default function TrackingsContextProvider({ children }) {
@@ -38,12 +39,13 @@ export default function TrackingsContextProvider({ children }) {
     });
   };
 
-  const track = ({ id }) => {
-    setTrackings((trackings) => {
-      const tracking = trackings.find((t) => t.id === id);
-      tracking.track();
-      return [...trackings];
-    });
+  const track = async ({ trackingId }) => {
+    return await trackingsApi.track({ trackingId });
+    // setTrackings((trackings) => {
+    //   const tracking = trackings.find((t) => t.id === id);
+    //   tracking.track();
+    //   return [...trackings];
+    // });
   };
 
   const listTrackings = async ({ page = 1, perPage = 10 }) => {
@@ -57,9 +59,13 @@ export default function TrackingsContextProvider({ children }) {
     }
   };
 
-  const findTracking = async (id) => {
-    return TrackingModel.find(id);
+  const findTracking = async (trackingId) => {
+    return await trackingsApi.getTracking({ trackingId })
   };
+
+  const listOccurrences = async ({ trackingId, page, perPage }) => {
+    return await trackingsApi.occurrences({ trackingId, page, perPage });
+  }
 
   useEffect(() => {
     const load = async () => {
@@ -78,6 +84,7 @@ export default function TrackingsContextProvider({ children }) {
     track,
     listTrackings,
     findTracking,
+    listOccurrences,
   };
 
   return (
