@@ -1,6 +1,10 @@
 import { useContext, useEffect } from "react";
 import { createContext, useState } from "react";
-import { currentAuthenticatedUser, extractUser, signOut } from "../../util/auth";
+import {
+  currentAuthenticatedUser,
+  extractUser,
+  signOut,
+} from "../../util/auth";
 
 export const AuthContext = createContext({
   isAuthenticated: false,
@@ -39,7 +43,7 @@ export default function AuthContextProvider({ children }) {
     if (signedInUser.error === "NotAuthenticated") {
       callSignOut();
     } else {
-      console.log("possible user on sign in:", signedInUser);
+      // console.log("possible user on sign in:", signedInUser);
       if (signedInUser) {
         callSignIn(signedInUser);
       }

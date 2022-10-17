@@ -3,16 +3,14 @@ import { View, StyleSheet } from "react-native";
 import { Text, TouchableRipple } from "react-native-paper";
 import useColors from "../util/hooks/useColors";
 
-export default function TrackingListItem({ id, name, lastOccurrenceTime }) {
+export default function TrackingListItem({ trackingId, name, lastOccurrenceTime }) {
   const navigation = useNavigation();
 
   const colors = useColors;
-  const lastOccurrenceTimeStr = lastOccurrenceTime
-    ? lastOccurrenceTime.toLocaleString()
-    : "Never";
-	
+  const lastOccurrenceTimeStr = lastOccurrenceTime ? lastOccurrenceTime : "Never";
+
 	const handlePress = () => {
-		navigation.navigate("Tracking", { id })
+		navigation.navigate("Tracking", { trackingId })
 	}
 
   return (

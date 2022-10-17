@@ -1,19 +1,6 @@
-import {
-  useContext,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { useContext, useLayoutEffect, useRef, useState } from "react";
 import { StyleSheet, SafeAreaView, FlatList, View } from "react-native";
-import {
-  IconButton,
-  Text,
-  Divider,
-  Modal,
-  Portal,
-  Snackbar,
-} from "react-native-paper";
+import { IconButton, Text, Divider, Modal, Portal, Snackbar, } from "react-native-paper";
 import TrackingListItem from "../components/TrackingListItem";
 import { Swipeable } from "react-native-gesture-handler";
 import TrackingForm from "../components/TrackingForm";
@@ -50,9 +37,9 @@ function TrackingListItemSwipeable({ onSwipeRight, item }) {
       onSwipeableOpen={handleSwipe}
     >
       <TrackingListItem
-        id={item.id}
+        trackingId={item.trackingId}
         name={item.name}
-        lastOccurrenceTime={item.lastOccurrenceTime()}
+        lastOccurrenceTime={item.lastOccurrenceTime}
       />
     </Swipeable>
   );
@@ -63,10 +50,6 @@ export default function TrackingsScreen({ navigation }) {
   const [trackingModalVisible, setTrackingModalVisible] = useState(false);
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const trackingsCtx = useContext(TrackingsContext);
-
-  useEffect(() => {
-    trackingsCtx.fetchTrackings();
-  }, []);
 
   const showModal = () => {
     setTrackingModalVisible(true);
@@ -95,7 +78,7 @@ export default function TrackingsScreen({ navigation }) {
   };
 
   const handleTracking = (tracking) => {
-    trackingsCtx.track({ id: tracking.id });
+    trackingsCtx.track({ trackingId: tracking.id });
   };
 
   useLayoutEffect(() => {
