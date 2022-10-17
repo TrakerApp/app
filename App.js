@@ -22,7 +22,9 @@ function Root() {
       <PaperProvider theme={theme.paper}>
         <NavigationContainer theme={theme.navigation}>
           {authContext.isAuthenticated ? (
-            <AuthenticatedNavigator />
+            <TrackingsContextProvider>
+              <AuthenticatedNavigator />
+            </TrackingsContextProvider>
           ) : (
             <UnauthenticatedNavigator />
           )}
@@ -37,9 +39,7 @@ export default function App() {
     <>
       <AuthContextProvider>
         <PreferencesContextProvider>
-          <TrackingsContextProvider>
-            <Root />
-          </TrackingsContextProvider>
+          <Root />
         </PreferencesContextProvider>
       </AuthContextProvider>
     </>
