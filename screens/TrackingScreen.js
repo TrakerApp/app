@@ -66,7 +66,7 @@ export default function TrackingScreen({ navigation, route }) {
     const { status, data } = await trackingsCtx.track({
       trackingId: trackingId,
     });
-    console.log("status, data is", status, data);
+
     if (status === 201) {
       setTracking({
         ...tracking,
@@ -74,8 +74,7 @@ export default function TrackingScreen({ navigation, route }) {
         weekOccurrences: tracking.weekOccurrences + 1,
       });
 
-      // NOTE: WE WILL CHANGE lastOccurrenceAt -> createdAt
-      setOccurrences((prevOccurrences) => [{ occurrenceId: data.occurrenceId, createdAt: data.lastOccurrenceAt }, ...prevOccurrences]);
+      setOccurrences((prevOccurrences) => [{ occurrenceId: data.occurrenceId, createdAt: data.createdAt }, ...prevOccurrences]);
     }
   };
 

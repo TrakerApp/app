@@ -41,10 +41,11 @@ export default function TrackingsContextProvider({ children }) {
 
   const track = async ({ trackingId }) => {
     const res = await trackingsApi.track({ trackingId });
+
     if (res.status === 201) {
       setTrackings((trackings) => {
         const tracking = trackings.find((t) => t.trackingId === trackingId);
-        tracking.lastOccurrenceAt = res.data.lastOccurrenceAt;
+        tracking.lastOccurrenceAt = res.data.createdAt;
         return [...trackings];
       });
     }
