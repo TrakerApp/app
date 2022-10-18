@@ -13,6 +13,7 @@ const getPluralSingular = (count, singular, plural) => {
 export default function TrackingScreen({ navigation, route }) {
   const trackingsCtx = useContext(TrackingsContext);
   const [tracking, setTracking] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [occurrences, setOccurrences] = useState([]);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const colors = useColors();
@@ -33,29 +34,23 @@ export default function TrackingScreen({ navigation, route }) {
   }, [navigation]);
 
   useEffect(() => {
-    const fetchTracking = async () => {
-      const { status, data } = await trackingsCtx.findTracking(trackingId);
+    trackingsCtx.findTracking(trackingId).then((res) => {
+      const { status, data } = res;
       if (status === 200) {
         setTracking(data);
       }
-    };
+    });
 
-    const fetchOccurrences = async () => {
-      const { status, data } = await trackingsCtx.listOccurrences({
-        trackingId,
-        page: 1,
-        perPage: 10,
-      });
+    trackingsCtx.listOccurrences({ trackingId, page: 1, perPage: 10, })
+    .then((res) => {
+      const { status, data } = res;
       if (status === 200) {
         console.log("OCCURRENCES DATA: data", data);
         setOccurrences(data.occurrences);
       } else {
-        console.log("error on fetch occurrences:", status, data)
+        console.log("error on fetch occurrences:", status, data);
       }
-    }
-
-    fetchTracking();
-    fetchOccurrences();
+    });
   }, [trackingId]);
 
   if (!tracking) {
@@ -74,7 +69,12 @@ export default function TrackingScreen({ navigation, route }) {
         weekOccurrences: tracking.weekOccurrences + 1,
       });
 
-      setOccurrences((prevOccurrences) => [{ occurrenceId: data.occurrenceId, createdAt: data.createdAt }, ...prevOccurrences]);
+      setOccurrences((prevOccurrences) => [
+        { occurrenceId: data.occurrenceId, createdAt: data.createdAt },
+        ...prevOccurrences,
+      ]);
+    } else {
+      console.log("error on TrackingScreen.handleTrack:", status, data);
     }
   };
 

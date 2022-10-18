@@ -77,8 +77,8 @@ export default function TrackingsScreen({ navigation }) {
     showSnackbar();
   };
 
-  const handleTracking = (tracking) => {
-    trackingsCtx.track({ trackingId: tracking.id });
+  const handleTracking = async (tracking) => {
+    await trackingsCtx.track({ trackingId: tracking.id });
   };
 
   useLayoutEffect(() => {

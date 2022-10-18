@@ -7,7 +7,7 @@ export default function TrackingListItem({ trackingId, name, lastOccurrenceAt })
   const navigation = useNavigation();
 
   const colors = useColors;
-  const lastOccurrenceTimeStr = lastOccurrenceAt ? lastOccurrenceAt : "Never";
+  const lastOccurrenceTimeStr = lastOccurrenceAt || "Never";
 
 	const handlePress = () => {
 		navigation.navigate("Tracking", { trackingId })
