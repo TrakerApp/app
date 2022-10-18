@@ -58,6 +58,7 @@ export default function TrackingScreen({ navigation, route }) {
   }
 
   const handleTrack = async () => {
+    setLoading(true)
     const { status, data } = await trackingsCtx.track({
       trackingId: trackingId,
     });
@@ -76,14 +77,17 @@ export default function TrackingScreen({ navigation, route }) {
     } else {
       console.log("error on TrackingScreen.handleTrack:", status, data);
     }
+    setLoading(false)
   };
 
   const showModal = () => setEditModalVisible(true);
   const hideModal = () => setEditModalVisible(false);
 
-  const handleSaveName = ({ name }) => {
-    trackingsCtx.editTracking({ trackingId, name });
+  const handleSaveName = async ({ name }) => {
+    setLoading(true)
+    await trackingsCtx.editTracking({ trackingId, name });
     hideModal();
+    setLoading(false)
   };
 
   const hasOccurrences = occurrences.length > 0;
@@ -93,6 +97,7 @@ export default function TrackingScreen({ navigation, route }) {
       <Portal>
         <Modal visible={editModalVisible} onDismiss={hideModal}>
           <TrackingForm
+            loading={loading}
             defaultValues={{ name: tracking.name }}
             focusInput={editModalVisible}
             onSave={handleSaveName}
@@ -105,10 +110,10 @@ export default function TrackingScreen({ navigation, route }) {
 
       <Text style={styles.title}>{tracking.name}</Text>
       <View style={styles.buttonsContainer}>
-        <Button style={styles.button} mode="outlined" onPress={showModal}>
+        <Button style={styles.button} disabled={loading} mode="outlined" onPress={showModal}>
           Edit
         </Button>
-        <Button style={styles.button} mode="outlined" onPress={handleTrack}>
+        <Button style={styles.button} disabled={loading} mode="outlined" onPress={handleTrack}>
           Track
         </Button>
       </View>

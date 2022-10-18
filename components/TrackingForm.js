@@ -8,6 +8,7 @@ const blankForm = { name: "" };
 export default function TrackingForm({
   focusInput,
   onSave,
+  loading,
   onCancel,
   defaultValues = {},
   buttonLabel = "Create",
@@ -18,10 +19,10 @@ export default function TrackingForm({
   const nameInputRef = useRef(null);
   const colors = useColors();
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (form.name !== "") {
       setNameHasError(false);
-      onSave(form);
+      await onSave(form);
       setForm((currentValues) => {
         return { ...currentValues, ...blankForm };
       });
@@ -64,6 +65,7 @@ export default function TrackingForm({
       <TextInput
         ref={nameInputRef}
         mode="outlined"
+        disabled={loading}
         error={nameHasError}
         label="Name"
         value={form.name}
@@ -81,10 +83,10 @@ export default function TrackingForm({
         </HelperText>
       )}
       <View style={styles.buttonsContainer}>
-        <Button style={styles.button} mode="outlined" onPress={handleCancel}>
+        <Button style={styles.button} disabled={loading} mode="outlined" onPress={handleCancel}>
           Cancel
         </Button>
-        <Button style={styles.button} mode="outlined" onPress={handleCreate}>
+        <Button style={styles.button} disabled={loading} mode="outlined" onPress={handleCreate}>
           {buttonLabel}
         </Button>
       </View>

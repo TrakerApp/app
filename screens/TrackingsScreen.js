@@ -48,6 +48,7 @@ function TrackingListItemSwipeable({ onSwipeRight, item }) {
 export default function TrackingsScreen({ navigation }) {
   // useMemo() to fetch from API
   const [trackingModalVisible, setTrackingModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [snackbarVisible, setSnackbarVisible] = useState(false);
   const trackingsCtx = useContext(TrackingsContext);
 
@@ -69,15 +70,18 @@ export default function TrackingsScreen({ navigation }) {
     showModal();
   };
 
-  const handleCreateTracking = (tracking) => {
+  const handleCreateTracking = async (tracking) => {
     // create tracking
-    trackingsCtx.addTracking(tracking);
+    setLoading(true)
+    await trackingsCtx.addTracking(tracking);
     // hide modal
     hideModal();
     showSnackbar();
+    setLoading(false)
   };
 
   const handleTracking = async (tracking) => {
+    // no setLoading here because user can do other actions like create tracking meanwhile
     await trackingsCtx.track({ trackingId: tracking.id });
   };
 
@@ -94,6 +98,7 @@ export default function TrackingsScreen({ navigation }) {
       <Portal>
         <Modal visible={trackingModalVisible} onDismiss={hideModal}>
           <TrackingForm
+            loading={loading}
             focusInput={trackingModalVisible}
             onSave={handleCreateTracking}
             onCancel={hideModal}
