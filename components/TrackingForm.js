@@ -10,6 +10,8 @@ export default function TrackingForm({
   onSave,
   loading,
   onCancel,
+  title,
+  error,
   defaultValues = {},
   buttonLabel = "Create",
   showHelp = true,
@@ -22,10 +24,12 @@ export default function TrackingForm({
   const handleCreate = async () => {
     if (form.name !== "") {
       setNameHasError(false);
-      await onSave(form);
-      setForm((currentValues) => {
-        return { ...currentValues, ...blankForm };
-      });
+      const { status } = await onSave(form);
+      if (status === 201) {
+        setForm((currentValues) => {
+          return { ...currentValues, ...blankForm };
+        });
+      }
     } else {
       setNameHasError(true);
     }
@@ -61,7 +65,7 @@ export default function TrackingForm({
         { backgroundColor: colors.modalBackground },
       ]}
     >
-      <Text style={styles.title}>Add new tracking</Text>
+      <Text style={styles.title}>{title}</Text>
       <TextInput
         ref={nameInputRef}
         mode="outlined"
@@ -75,6 +79,11 @@ export default function TrackingForm({
       {nameHasError && (
         <HelperText type="error" visible={nameHasError}>
           Name is required
+        </HelperText>
+      )}
+      {!nameHasError && error !== '' && (
+        <HelperText type="error">
+          {error}
         </HelperText>
       )}
       {showHelp && (

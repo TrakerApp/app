@@ -15,6 +15,7 @@ export default function TrackingScreen({ navigation, route }) {
   const [tracking, setTracking] = useState(null);
   const [loading, setLoading] = useState(false);
   const [occurrences, setOccurrences] = useState([]);
+  const [error, setError] = useState("");
   const [editModalVisible, setEditModalVisible] = useState(false);
   const colors = useColors();
   const { trackingId } = route.params;
@@ -85,10 +86,17 @@ export default function TrackingScreen({ navigation, route }) {
 
   const handleSaveName = async ({ name }) => {
     setLoading(true)
-    await trackingsCtx.updateTracking({ trackingId, name });
-    setTracking((prevTracking) => ({ ...prevTracking, name }));
-    hideModal();
+    setError("")
+    const { status, data } = await trackingsCtx.updateTracking({ trackingId, name });
+    console.log("on handleSaveName status, data", status, data);
+    if (status === 201) {
+      setTracking((prevTracking) => ({ ...prevTracking, name }));
+      hideModal();
+    } else {
+      setError(data.error.toString().match(/tracking.name.already.exists/) ? "Tracking name already exists" : "Error when updating the tracking, please try again later");
+    }
     setLoading(false)
+    return { status, data }
   };
 
   const hasOccurrences = occurrences.length > 0;
@@ -98,6 +106,8 @@ export default function TrackingScreen({ navigation, route }) {
       <Portal>
         <Modal visible={editModalVisible} onDismiss={hideModal}>
           <TrackingForm
+            title="Edit Tracking"
+            error={error}
             loading={loading}
             defaultValues={{ name: tracking.name }}
             focusInput={editModalVisible}

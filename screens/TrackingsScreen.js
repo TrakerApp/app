@@ -50,6 +50,7 @@ export default function TrackingsScreen({ navigation }) {
   const [trackingModalVisible, setTrackingModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [error, setError] = useState("");
   const trackingsCtx = useContext(TrackingsContext);
 
   const showModal = () => {
@@ -70,14 +71,20 @@ export default function TrackingsScreen({ navigation }) {
     showModal();
   };
 
-  const handleCreateTracking = async (tracking) => {
+  const handleSaveButtonPress = async (tracking) => {
     // create tracking
     setLoading(true)
-    await trackingsCtx.createTracking(tracking);
-    // hide modal
-    hideModal();
-    showSnackbar();
+    setError("")
+    const { status, data } = await trackingsCtx.createTracking(tracking);
+    if (status === 201) {
+      // hide modal
+      hideModal();
+      showSnackbar();
+    } else {
+      setError(data.error.toString().match(/tracking.name.already.exists/) ? "Tracking name already exists" : "Error when creating the tracking, please try again later");
+    }
     setLoading(false)
+    return { status, data };
   };
 
   const handleTracking = async (tracking) => {
@@ -98,9 +105,11 @@ export default function TrackingsScreen({ navigation }) {
       <Portal>
         <Modal visible={trackingModalVisible} onDismiss={hideModal}>
           <TrackingForm
+            title="Add new tracking"
             loading={loading}
+            error={error}
             focusInput={trackingModalVisible}
-            onSave={handleCreateTracking}
+            onSave={handleSaveButtonPress}
             onCancel={hideModal}
           />
         </Modal>

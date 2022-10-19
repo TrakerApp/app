@@ -5,7 +5,7 @@ import { useAuthContext } from "./auth-context";
 export const TrackingsContext = createContext({
   trackings: [],
   createTracking: async ({ name }) => {},
-  updateTracking: async ({ id, name }) => {},
+  updateTracking: async ({ trackingId, name }) => {},
   track: async ({ trackingId }) => {},
   listTrackings: async ({ page, perPage }) => {},
   findTracking: async (trackingId) => {},
