@@ -3,6 +3,7 @@
 import { Amplify, Auth, Hub } from "aws-amplify";
 import { COGNITO_POOL_ID, COGNITO_CLIENT_ID } from "@env";
 import { getAuthErrorMessage } from "./authErrors";
+import { decode } from "base-64";
 
 Amplify.configure({
   Auth: {
@@ -66,18 +67,33 @@ Amplify.configure({
   },
 });
 
+export const getJwtData = (jwt) => {
+  const base64Url = jwt.split(".")[1];
+  const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+  const jsonPayload = decodeURIComponent(
+    decode(base64)
+      .split("")
+      .map(function (c) {
+        return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+      })
+      .join("")
+  );
+  return JSON.parse(jsonPayload);
+};
+
 export const extractUser = (data) => {
   // "data" is an object that is returned by Auth, it has it's own methods, it's not a simple object
   if (data.email && data.sub && data.accessToken) {
     return data;
   }
 
+  const { exp } = getJwtData(data.signInUserSession.accessToken.jwtToken);
+
   return {
     email: data.attributes.email,
     sub: data.attributes.sub,
     accessToken: data.signInUserSession.accessToken.jwtToken,
-    idToken: data.signInUserSession.idToken.jwtToken,
-    refreshSession: data.refreshSession,
+    accessTokenExp: exp,
   };
 };
 
@@ -116,14 +132,18 @@ export const confirmSignUp = async (email, code) => {
   }
 };
 
-export const currentSession = async () => {
-  try {
-    return await Auth.currentSession();
-  } catch (error) {
-    console.log("error on auth getting currentSession:", error);
-
-    return { error: getAuthErrorMessage(error, "CouldNotFetchSession") };
-  }
+export const currentSession = () => {
+  return new Promise((resolve, reject) => {
+    Auth.currentSession()
+      .then((data) => {
+        console.log("got data from currentSession:", data)
+        resolve(data);
+      })
+      .catch((error) => {
+        console.log("error on auth getting currentSession:", error);
+        resolve({ error: getAuthErrorMessage(error, "CouldNotFetchSession") });
+      });
+  });
 };
 
 export const resendConfirmationCode = async (email) => {

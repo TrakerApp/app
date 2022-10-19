@@ -12,14 +12,19 @@ export const TrackingsContext = createContext({
   listOccurrences: async ({ trackingId, page, perPage }) => {},
 });
 
+const trackingsApi = async (authCtx) => {
+  const validToken = await authCtx.getValidAccessToken()
+
+  return new TrackingsApi(validToken)
+}
+
 export default function TrackingsContextProvider({ children }) {
   const [trackings, setTrackings] = useState([]);
   const authCtx = useAuthContext();
 
-  const trackingsApi = new TrackingsApi(authCtx.accessToken);
-
   const createTracking = async ({ name }) => {
-    const res = await trackingsApi.createTracking({ name });
+    const apiClient = await trackingsApi(authCtx)
+    const res = await apiClient.createTracking({ name });
     const { status, data } = res;
     console.log("result from createTracking:", status, data)
 
@@ -37,7 +42,8 @@ export default function TrackingsContextProvider({ children }) {
   };
 
   const updateTracking = async ({ trackingId, name }) => {
-    const res = await trackingsApi.updateTracking({ trackingId, name });
+    const apiClient = await trackingsApi(authCtx)
+    const res = await apiClient.updateTracking({ trackingId, name });
     const { status, data } = res;
     console.log("result from updateTracking:", status, data)
 
@@ -53,7 +59,8 @@ export default function TrackingsContextProvider({ children }) {
   };
 
   const track = async ({ trackingId }) => {
-    const res = await trackingsApi.track({ trackingId });
+    const apiClient = await trackingsApi(authCtx)
+    const res = await apiClient.track({ trackingId });
     const { status, data } = res;
     console.log("result from track:", status, data)
 
@@ -69,7 +76,8 @@ export default function TrackingsContextProvider({ children }) {
   };
 
   const listTrackings = async ({ page = 1, perPage = 10 }) => {
-    const { status, data } = await trackingsApi.listTrackings({
+    const apiClient = await trackingsApi(authCtx)
+    const { status, data } = await apiClient.listTrackings({
       page,
       perPage,
     });
@@ -83,17 +91,19 @@ export default function TrackingsContextProvider({ children }) {
   };
 
   const findTracking = async (trackingId) => {
-    return await trackingsApi.getTracking({ trackingId });
+    const apiClient = await trackingsApi(authCtx)
+    return await apiClient.getTracking({ trackingId });
   };
 
   const listOccurrences = async ({ trackingId, page, perPage }) => {
-    return await trackingsApi.occurrences({ trackingId, page, perPage });
+    const apiClient = await trackingsApi(authCtx)
+    return await apiClient.occurrences({ trackingId, page, perPage });
   };
 
   useEffect(() => {
     const load = async () => {
       const { trackings } = await listTrackings({ page: 1, perPage: 10 });
-      console.log("trackings:", trackings);
+
       setTrackings(trackings);
     };
 

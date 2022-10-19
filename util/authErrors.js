@@ -8,6 +8,10 @@ const ERROR_MATCHES = [
     error: "UserAlreadyExists",
   },
   {
+    match: /An.account.with.the.given.email.already.exists/,
+    error: "UserAlreadyExists",
+  },
+  {
     match: /User.is.already.confirmed/,
     error: "UserAlreadyConfirmed",
   },
