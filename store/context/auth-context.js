@@ -55,10 +55,9 @@ export default function AuthContextProvider({ children }) {
   };
 
   const considerTokenExpired = () => {
-    // we reduce 1 second from access token exp, because we want to know if it'll be expired in advance for fetching a new token
-    const exp = new Date((currentUser.accessTokenExp - 1) * 1000);
+    const exp = new Date(currentUser.accessTokenExp * 1000);
     const now = new Date();
-    console.log("expiration date vs now:", exp, now)
+
     return now > exp;
   };
 
