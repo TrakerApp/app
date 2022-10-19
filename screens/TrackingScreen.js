@@ -85,7 +85,8 @@ export default function TrackingScreen({ navigation, route }) {
 
   const handleSaveName = async ({ name }) => {
     setLoading(true)
-    await trackingsCtx.editTracking({ trackingId, name });
+    await trackingsCtx.updateTracking({ trackingId, name });
+    setTracking((prevTracking) => ({ ...prevTracking, name }));
     hideModal();
     setLoading(false)
   };

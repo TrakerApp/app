@@ -73,7 +73,7 @@ export default function TrackingsScreen({ navigation }) {
   const handleCreateTracking = async (tracking) => {
     // create tracking
     setLoading(true)
-    await trackingsCtx.addTracking(tracking);
+    await trackingsCtx.createTracking(tracking);
     // hide modal
     hideModal();
     showSnackbar();
@@ -82,7 +82,7 @@ export default function TrackingsScreen({ navigation }) {
 
   const handleTracking = async (tracking) => {
     // no setLoading here because user can do other actions like create tracking meanwhile
-    await trackingsCtx.track({ trackingId: tracking.id });
+    await trackingsCtx.track({ trackingId: tracking.trackingId });
   };
 
   useLayoutEffect(() => {

@@ -68,7 +68,7 @@ export default class TrackingsApi {
     });
   }
 
-  async updateTrack({ trackingId, name }) {
+  async updateTracking({ trackingId, name }) {
     return await this.makeRequest({
       method: "put",
       path: `trackings/${trackingId}`,
