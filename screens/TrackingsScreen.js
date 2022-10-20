@@ -1,6 +1,13 @@
 import { useContext, useLayoutEffect, useRef, useState } from "react";
 import { StyleSheet, SafeAreaView, FlatList, View } from "react-native";
-import { IconButton, Text, Divider, Modal, Portal, Snackbar, } from "react-native-paper";
+import {
+  IconButton,
+  Text,
+  Divider,
+  Modal,
+  Portal,
+  Snackbar,
+} from "react-native-paper";
 import TrackingListItem from "../components/TrackingListItem";
 import { Swipeable } from "react-native-gesture-handler";
 import TrackingForm from "../components/TrackingForm";
@@ -10,7 +17,7 @@ const MESSAGES = {
   TrackingCreated: "Tracking added",
   Tracked: "Tracked successfully",
   error: "There was an error on your request, please try again later",
-}
+};
 
 function swipeableRightActions(progress, dragX) {
   // const trans = dragX.interpolate({
@@ -55,7 +62,7 @@ export default function TrackingsScreen({ navigation }) {
   // useMemo() to fetch from API
   const [trackingModalVisible, setTrackingModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [snackbarMessage, setSnackbarMessage] = useState('')
+  const [snackbarMessage, setSnackbarMessage] = useState("");
   const [error, setError] = useState("");
   const trackingsCtx = useContext(TrackingsContext);
 
@@ -66,10 +73,10 @@ export default function TrackingsScreen({ navigation }) {
     setTrackingModalVisible(false);
   };
   const showSnackbar = (message) => {
-    setSnackbarMessage(MESSAGES[message])
+    setSnackbarMessage(MESSAGES[message]);
   };
   const hideSnackbar = () => {
-    setSnackbarMessage('')
+    setSnackbarMessage("");
   };
 
   const handleAddNewTracking = () => {
@@ -79,17 +86,21 @@ export default function TrackingsScreen({ navigation }) {
 
   const handleSaveButtonPress = async (tracking) => {
     // create tracking
-    setLoading(true)
-    setError("")
+    setLoading(true);
+    setError("");
     const { status, data } = await trackingsCtx.createTracking(tracking);
     if (status === 201) {
       // hide modal
       hideModal();
       showSnackbar("TrackingCreated");
     } else {
-      setError(data.error.toString().match(/tracking.name.already.exists/) ? "Tracking name already exists" : "Error when creating the tracking, please try again later");
+      setError(
+        data.error.toString().match(/tracking.name.already.exists/)
+          ? "Tracking name already exists"
+          : "Error when creating the tracking, please try again later"
+      );
     }
-    setLoading(false)
+    setLoading(false);
     return { status, data };
   };
 
@@ -98,12 +109,12 @@ export default function TrackingsScreen({ navigation }) {
     const res = await trackingsCtx.track({ trackingId: tracking.trackingId });
 
     if (res.status === 201) {
-      setSnackbarMessage(MESSAGES.Tracked)
+      setSnackbarMessage(MESSAGES.Tracked);
     } else if (res.status >= 400 && res.status !== 401) {
       showSnackbar("error");
     }
 
-    return res
+    return res;
   };
 
   useLayoutEffect(() => {
@@ -142,7 +153,7 @@ export default function TrackingsScreen({ navigation }) {
         ItemSeparatorComponent={() => <Divider />}
       />
       <Snackbar
-        visible={snackbarMessage !== ''}
+        visible={snackbarMessage !== ""}
         onDismiss={hideSnackbar}
         duration={3000}
         action={{

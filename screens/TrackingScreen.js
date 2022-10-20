@@ -1,6 +1,13 @@
 import { useContext, useEffect, useLayoutEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { Button, IconButton, Text, Portal, Modal } from "react-native-paper";
+import {
+  Button,
+  IconButton,
+  Text,
+  Portal,
+  Modal,
+  Snackbar,
+} from "react-native-paper";
 import { TrackingsContext } from "../store/context/trackings-context";
 import useColors from "../util/hooks/useColors";
 import TrackingForm from "../components/TrackingForm";
@@ -9,7 +16,7 @@ const MESSAGES = {
   TrackingUpdated: "Tracking name changed",
   Tracked: "Tracked successfully",
   error: "There was an error on your request, please try again later",
-}
+};
 
 const getPluralSingular = (count, singular, plural) => {
   const text = count === 1 ? singular : plural;
@@ -84,13 +91,13 @@ export default function TrackingScreen({ navigation, route }) {
         ...prevOccurrences,
       ]);
 
-      setSnackbarMessage(MESSAGES.Tracked)
+      setSnackbarMessage(MESSAGES.Tracked);
     } else if (status === 401) {
       // managed on auth context, user will be sign out automatically
-      return
+      return;
     } else {
       console.log("error on TrackingScreen.handleTrack:", status, data);
-      setSnackbarMessage(MESSAGES.error)
+      setSnackbarMessage(MESSAGES.error);
     }
     setLoading(false);
   };
@@ -109,7 +116,7 @@ export default function TrackingScreen({ navigation, route }) {
     if (status === 201) {
       setTracking((prevTracking) => ({ ...prevTracking, name }));
       hideModal();
-      setSnackbarMessage(MESSAGES.TrackingUpdated)
+      setSnackbarMessage(MESSAGES.TrackingUpdated);
     } else {
       setError(
         data.error.toString().match(/tracking.name.already.exists/)
