@@ -5,6 +5,12 @@ import { TrackingsContext } from "../store/context/trackings-context";
 import useColors from "../util/hooks/useColors";
 import TrackingForm from "../components/TrackingForm";
 
+const MESSAGES = {
+  TrackingUpdated: "Tracking name changed",
+  Tracked: "Tracked successfully",
+  error: "There was an error on your request, please try again later",
+}
+
 const getPluralSingular = (count, singular, plural) => {
   const text = count === 1 ? singular : plural;
   return `${count} ${text}`;
@@ -14,6 +20,7 @@ export default function TrackingScreen({ navigation, route }) {
   const trackingsCtx = useContext(TrackingsContext);
   const [tracking, setTracking] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
   const [occurrences, setOccurrences] = useState([]);
   const [error, setError] = useState("");
   const [editModalVisible, setEditModalVisible] = useState(false);
@@ -42,16 +49,17 @@ export default function TrackingScreen({ navigation, route }) {
       }
     });
 
-    trackingsCtx.listOccurrences({ trackingId, page: 1, perPage: 10, })
-    .then((res) => {
-      const { status, data } = res;
-      if (status === 200) {
-        console.log("OCCURRENCES DATA: data", data);
-        setOccurrences(data.occurrences);
-      } else {
-        console.log("error on fetch occurrences:", status, data);
-      }
-    });
+    trackingsCtx
+      .listOccurrences({ trackingId, page: 1, perPage: 10 })
+      .then((res) => {
+        const { status, data } = res;
+        if (status === 200) {
+          console.log("OCCURRENCES DATA: data", data);
+          setOccurrences(data.occurrences);
+        } else {
+          console.log("error on fetch occurrences:", status, data);
+        }
+      });
   }, [trackingId]);
 
   if (!tracking) {
@@ -59,7 +67,7 @@ export default function TrackingScreen({ navigation, route }) {
   }
 
   const handleTrack = async () => {
-    setLoading(true)
+    setLoading(true);
     const { status, data } = await trackingsCtx.track({
       trackingId: trackingId,
     });
@@ -75,28 +83,42 @@ export default function TrackingScreen({ navigation, route }) {
         { occurrenceId: data.occurrenceId, createdAt: data.createdAt },
         ...prevOccurrences,
       ]);
+
+      setSnackbarMessage(MESSAGES.Tracked)
+    } else if (status === 401) {
+      // managed on auth context, user will be sign out automatically
+      return
     } else {
       console.log("error on TrackingScreen.handleTrack:", status, data);
+      setSnackbarMessage(MESSAGES.error)
     }
-    setLoading(false)
+    setLoading(false);
   };
 
   const showModal = () => setEditModalVisible(true);
   const hideModal = () => setEditModalVisible(false);
 
   const handleSaveName = async ({ name }) => {
-    setLoading(true)
-    setError("")
-    const { status, data } = await trackingsCtx.updateTracking({ trackingId, name });
+    setLoading(true);
+    setError("");
+    const { status, data } = await trackingsCtx.updateTracking({
+      trackingId,
+      name,
+    });
     console.log("on handleSaveName status, data", status, data);
     if (status === 201) {
       setTracking((prevTracking) => ({ ...prevTracking, name }));
       hideModal();
+      setSnackbarMessage(MESSAGES.TrackingUpdated)
     } else {
-      setError(data.error.toString().match(/tracking.name.already.exists/) ? "Tracking name already exists" : "Error when updating the tracking, please try again later");
+      setError(
+        data.error.toString().match(/tracking.name.already.exists/)
+          ? "Tracking name already exists"
+          : "Error when updating the tracking, please try again later"
+      );
     }
-    setLoading(false)
-    return { status, data }
+    setLoading(false);
+    return { status, data };
   };
 
   const hasOccurrences = occurrences.length > 0;
@@ -121,10 +143,20 @@ export default function TrackingScreen({ navigation, route }) {
 
       <Text style={styles.title}>{tracking.name}</Text>
       <View style={styles.buttonsContainer}>
-        <Button style={styles.button} disabled={loading} mode="outlined" onPress={showModal}>
+        <Button
+          style={styles.button}
+          disabled={loading}
+          mode="outlined"
+          onPress={showModal}
+        >
           Edit
         </Button>
-        <Button style={styles.button} disabled={loading} mode="outlined" onPress={handleTrack}>
+        <Button
+          style={styles.button}
+          disabled={loading}
+          mode="outlined"
+          onPress={handleTrack}
+        >
           Track
         </Button>
       </View>
@@ -159,6 +191,18 @@ export default function TrackingScreen({ navigation, route }) {
           </Text>
         )}
       </View>
+
+      <Snackbar
+        visible={snackbarMessage !== ""}
+        onDismiss={hideSnackbar}
+        duration={3000}
+        action={{
+          label: "Ok",
+          onPress: hideSnackbar,
+        }}
+      >
+        {snackbarMessage}
+      </Snackbar>
     </View>
   );
 }

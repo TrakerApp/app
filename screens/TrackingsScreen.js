@@ -6,6 +6,12 @@ import { Swipeable } from "react-native-gesture-handler";
 import TrackingForm from "../components/TrackingForm";
 import { TrackingsContext } from "../store/context/trackings-context";
 
+const MESSAGES = {
+  TrackingCreated: "Tracking added",
+  Tracked: "Tracked successfully",
+  error: "There was an error on your request, please try again later",
+}
+
 function swipeableRightActions(progress, dragX) {
   // const trans = dragX.interpolate({
   //   inputRange: [0, 50, 100, 101],
@@ -49,7 +55,7 @@ export default function TrackingsScreen({ navigation }) {
   // useMemo() to fetch from API
   const [trackingModalVisible, setTrackingModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [snackbarVisible, setSnackbarVisible] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('')
   const [error, setError] = useState("");
   const trackingsCtx = useContext(TrackingsContext);
 
@@ -59,11 +65,11 @@ export default function TrackingsScreen({ navigation }) {
   const hideModal = () => {
     setTrackingModalVisible(false);
   };
-  const showSnackbar = () => {
-    setSnackbarVisible(true);
+  const showSnackbar = (message) => {
+    setSnackbarMessage(MESSAGES[message])
   };
   const hideSnackbar = () => {
-    setSnackbarVisible(false);
+    setSnackbarMessage('')
   };
 
   const handleAddNewTracking = () => {
@@ -79,7 +85,7 @@ export default function TrackingsScreen({ navigation }) {
     if (status === 201) {
       // hide modal
       hideModal();
-      showSnackbar();
+      showSnackbar("TrackingCreated");
     } else {
       setError(data.error.toString().match(/tracking.name.already.exists/) ? "Tracking name already exists" : "Error when creating the tracking, please try again later");
     }
@@ -89,7 +95,15 @@ export default function TrackingsScreen({ navigation }) {
 
   const handleTracking = async (tracking) => {
     // no setLoading here because user can do other actions like create tracking meanwhile
-    await trackingsCtx.track({ trackingId: tracking.trackingId });
+    const res = await trackingsCtx.track({ trackingId: tracking.trackingId });
+
+    if (res.status === 201) {
+      setSnackbarMessage(MESSAGES.Tracked)
+    } else if (res.status >= 400 && res.status !== 401) {
+      showSnackbar("error");
+    }
+
+    return res
   };
 
   useLayoutEffect(() => {
@@ -128,7 +142,7 @@ export default function TrackingsScreen({ navigation }) {
         ItemSeparatorComponent={() => <Divider />}
       />
       <Snackbar
-        visible={snackbarVisible}
+        visible={snackbarMessage !== ''}
         onDismiss={hideSnackbar}
         duration={3000}
         action={{
@@ -136,7 +150,7 @@ export default function TrackingsScreen({ navigation }) {
           onPress: hideSnackbar,
         }}
       >
-        Tracking added
+        {snackbarMessage}
       </Snackbar>
     </SafeAreaView>
   );
