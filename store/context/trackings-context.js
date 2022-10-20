@@ -15,7 +15,11 @@ export const TrackingsContext = createContext({
 const trackingsApi = async (authCtx) => {
   const validToken = await authCtx.getValidAccessToken()
 
-  return new TrackingsApi(validToken)
+  if (validToken) {
+    return new TrackingsApi(validToken)
+  } else {
+    return null
+  }
 }
 
 export default function TrackingsContextProvider({ children }) {
@@ -24,6 +28,7 @@ export default function TrackingsContextProvider({ children }) {
 
   const createTracking = async ({ name }) => {
     const apiClient = await trackingsApi(authCtx)
+    if (!apiClient) { return } // auth error: auth context does sign out automatically
     const res = await apiClient.createTracking({ name });
     const { status, data } = res;
     console.log("result from createTracking:", status, data)
@@ -43,6 +48,7 @@ export default function TrackingsContextProvider({ children }) {
 
   const updateTracking = async ({ trackingId, name }) => {
     const apiClient = await trackingsApi(authCtx)
+    if (!apiClient) { return } // auth error: auth context does sign out automatically
     const res = await apiClient.updateTracking({ trackingId, name });
     const { status, data } = res;
     console.log("result from updateTracking:", status, data)
@@ -60,6 +66,7 @@ export default function TrackingsContextProvider({ children }) {
 
   const track = async ({ trackingId }) => {
     const apiClient = await trackingsApi(authCtx)
+    if (!apiClient) { return } // auth error: auth context does sign out automatically
     const res = await apiClient.track({ trackingId });
     const { status, data } = res;
     console.log("result from track:", status, data)
@@ -77,6 +84,7 @@ export default function TrackingsContextProvider({ children }) {
 
   const listTrackings = async ({ page = 1, perPage = 10 }) => {
     const apiClient = await trackingsApi(authCtx)
+    if (!apiClient) { return } // auth error: auth context does sign out automatically
     const { status, data } = await apiClient.listTrackings({
       page,
       perPage,
@@ -92,11 +100,13 @@ export default function TrackingsContextProvider({ children }) {
 
   const findTracking = async (trackingId) => {
     const apiClient = await trackingsApi(authCtx)
+    if (!apiClient) { return } // auth error: auth context does sign out automatically
     return await apiClient.getTracking({ trackingId });
   };
 
   const listOccurrences = async ({ trackingId, page, perPage }) => {
     const apiClient = await trackingsApi(authCtx)
+    if (!apiClient) { return } // auth error: auth context does sign out automatically
     return await apiClient.occurrences({ trackingId, page, perPage });
   };
 
