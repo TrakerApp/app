@@ -72,9 +72,6 @@ export default function TrackingsScreen({ navigation }) {
   const hideModal = () => {
     setTrackingModalVisible(false);
   };
-  const showSnackbar = (message) => {
-    setSnackbarMessage(MESSAGES[message]);
-  };
   const hideSnackbar = () => {
     setSnackbarMessage("");
   };
@@ -92,7 +89,7 @@ export default function TrackingsScreen({ navigation }) {
     if (status === 201) {
       // hide modal
       hideModal();
-      showSnackbar("TrackingCreated");
+      setSnackbarMessage(MESSAGES.TrackingCreated);
     } else {
       setError(
         data.error.toString().match(/tracking.name.already.exists/)
@@ -111,7 +108,7 @@ export default function TrackingsScreen({ navigation }) {
     if (res.status === 201) {
       setSnackbarMessage(MESSAGES.Tracked);
     } else if (res.status >= 400 && res.status !== 401) {
-      showSnackbar("error");
+      setSnackbarMessage(MESSAGES.error);
     }
 
     return res;

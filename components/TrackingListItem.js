@@ -10,7 +10,7 @@ export default function TrackingListItem({ trackingId, name, lastOccurrenceAt })
   const lastOccurrenceTimeStr = lastOccurrenceAt || "Never";
 
 	const handlePress = () => {
-		navigation.navigate("Tracking", { trackingId })
+		navigation.navigate("Tracking", { trackingId, name })
 	}
 
   return (

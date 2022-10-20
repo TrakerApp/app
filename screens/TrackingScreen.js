@@ -19,6 +19,10 @@ const MESSAGES = {
 };
 
 const getPluralSingular = (count, singular, plural) => {
+  if (count === null) {
+    return "";
+  }
+
   const text = count === 1 ? singular : plural;
   return `${count} ${text}`;
 };
@@ -32,7 +36,7 @@ export default function TrackingScreen({ navigation, route }) {
   const [error, setError] = useState("");
   const [editModalVisible, setEditModalVisible] = useState(false);
   const colors = useColors();
-  const { trackingId } = route.params;
+  const { trackingId, name } = route.params;
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -48,6 +52,18 @@ export default function TrackingScreen({ navigation, route }) {
     });
   }, [navigation]);
 
+  useLayoutEffect(() => {
+    setLoading(true);
+    // real data is loaded below after "loading"
+    setTracking({
+      trackingId,
+      name,
+      todayOccurrences: null,
+      weekOccurrences: null,
+    });
+    setOccurrences([])
+  }, [trackingId, name]);
+
   useEffect(() => {
     trackingsCtx.findTracking(trackingId).then((res) => {
       const { status, data } = res;
@@ -61,17 +77,21 @@ export default function TrackingScreen({ navigation, route }) {
       .then((res) => {
         const { status, data } = res;
         if (status === 200) {
-          console.log("OCCURRENCES DATA: data", data);
           setOccurrences(data.occurrences);
         } else {
           console.log("error on fetch occurrences:", status, data);
         }
+        setLoading(false);
       });
   }, [trackingId]);
 
   if (!tracking) {
     return <Text>Loading...</Text>;
   }
+
+  const hideSnackbar = () => {
+    setSnackbarMessage("");
+  };
 
   const handleTrack = async () => {
     setLoading(true);
