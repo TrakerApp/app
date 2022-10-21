@@ -14,9 +14,8 @@ export const AuthContext = createContext({
   checkIfUserIsAuthenticated: async () => {},
   signIn: () => {},
   signOut: () => {},
-  accessToken: () => {},
   considerTokenExpired: () => {},
-  getValidAccessToken: async () => {},
+  getValidIdToken: async () => {},
 });
 
 export const useAuthContext = () => useContext(AuthContext);
@@ -55,14 +54,14 @@ export default function AuthContextProvider({ children }) {
   };
 
   const considerTokenExpired = () => {
-    const exp = new Date(currentUser.accessTokenExp * 1000);
+    const exp = new Date(currentUser.idTokenExp * 1000);
     const now = new Date();
 
     return now > exp;
   };
 
-  // always when needing an access token, this method should be called
-  const getValidAccessToken = () => {
+  // always when needing an id token, this method should be called
+  const getValidIdToken = () => {
     return new Promise(async (resolve, reject) => {
       if (considerTokenExpired()) {
         const data = await currentSession();
@@ -73,13 +72,13 @@ export default function AuthContextProvider({ children }) {
         } else {
           setCurrentUser((current) => ({
             ...current,
-            accessToken: data.accessToken.jwtToken,
-            accessTokenExp: data.accessToken.payload.exp,
+            idToken: data.idToken.jwtToken,
+            idTokenExp: data.idToken.payload.exp,
           }));
-          resolve(data.accessToken.jwtToken);
+          resolve(data.idToken.jwtToken);
         }
       } else {
-        resolve(currentUser.accessToken);
+        resolve(currentUser.idToken);
       }
     });
   };
@@ -98,7 +97,7 @@ export default function AuthContextProvider({ children }) {
         signOut: callSignOut,
         checkIfUserIsAuthenticated,
         considerTokenExpired,
-        getValidAccessToken,
+        getValidIdToken: getValidIdToken,
       }}
     >
       {children}

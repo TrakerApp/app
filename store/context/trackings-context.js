@@ -13,7 +13,7 @@ export const TrackingsContext = createContext({
 });
 
 const trackingsApi = async (authCtx) => {
-  const validToken = await authCtx.getValidAccessToken()
+  const validToken = await authCtx.getValidIdToken()
 
   if (validToken) {
     return new TrackingsApi(validToken)

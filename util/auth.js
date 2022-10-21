@@ -83,17 +83,17 @@ export const getJwtData = (jwt) => {
 
 export const extractUser = (data) => {
   // "data" is an object that is returned by Auth, it has it's own methods, it's not a simple object
-  if (data.email && data.sub && data.accessToken) {
+  if (data.email && data.sub && data.idToken) {
     return data;
   }
 
-  const { exp } = getJwtData(data.signInUserSession.accessToken.jwtToken);
+  const { exp } = getJwtData(data.signInUserSession.idToken.jwtToken);
 
   return {
     email: data.attributes.email,
     sub: data.attributes.sub,
-    accessToken: data.signInUserSession.accessToken.jwtToken,
-    accessTokenExp: exp,
+    idToken: data.signInUserSession.idToken.jwtToken,
+    idTokenExp: exp,
   };
 };
 
