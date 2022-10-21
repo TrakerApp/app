@@ -106,6 +106,7 @@ export const signUp = async (email, password) => {
         email: email.toLowerCase(), // optional
         // phone_number, // optional - E.164 number convention
         // other custom attributes
+        "custom:plan_name": "beta",
       },
       autoSignIn: {
         // optional - enables auto sign in after user is confirmed
