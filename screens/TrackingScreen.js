@@ -1,5 +1,5 @@
 import { useContext, useEffect, useLayoutEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { FlatList, StyleSheet, View } from "react-native";
 import {
   Button,
   IconButton,
@@ -7,6 +7,7 @@ import {
   Portal,
   Modal,
   Snackbar,
+  Divider,
 } from "react-native-paper";
 import { TrackingsContext } from "../store/context/trackings-context";
 import useColors from "../util/hooks/useColors";
@@ -17,6 +18,8 @@ const MESSAGES = {
   Tracked: "Tracked successfully",
   error: "There was an error on your request, please try again later",
 };
+
+const OCCURRENCES_PER_PAGE = 20;
 
 const getPluralSingular = (count, singular, plural) => {
   if (count === null) {
@@ -35,6 +38,9 @@ export default function TrackingScreen({ navigation, route }) {
   const [occurrences, setOccurrences] = useState([]);
   const [error, setError] = useState("");
   const [editModalVisible, setEditModalVisible] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const colors = useColors();
   const { trackingId, name } = route.params;
 
@@ -52,8 +58,16 @@ export default function TrackingScreen({ navigation, route }) {
     });
   }, [navigation]);
 
+  // reset state
+  useLayoutEffect(() => {
+    setOccurrences([]);
+    setCurrentPage(1);
+    setHasMore(true);
+  }, [trackingId]);
+
   useLayoutEffect(() => {
     setLoading(true);
+    setRefreshing(true);
     // real data is loaded below after "loading"
     setTracking({
       trackingId,
@@ -61,7 +75,7 @@ export default function TrackingScreen({ navigation, route }) {
       todayOccurrences: null,
       weekOccurrences: null,
     });
-    setOccurrences([])
+    setOccurrences([]);
   }, [trackingId, name]);
 
   useEffect(() => {
@@ -73,21 +87,50 @@ export default function TrackingScreen({ navigation, route }) {
     });
 
     trackingsCtx
-      .listOccurrences({ trackingId, page: 1, perPage: 10 })
+      .listOccurrences({ trackingId, page: 1, perPage: OCCURRENCES_PER_PAGE })
       .then((res) => {
         const { status, data } = res;
         if (status === 200) {
+          if (data.page >= data.totalPages) {
+            setHasMore(false);
+          }
           setOccurrences(data.occurrences);
         } else {
           console.log("error on fetch occurrences:", status, data);
         }
         setLoading(false);
+        setRefreshing(false);
       });
   }, [trackingId]);
 
   if (!tracking) {
     return <Text>Loading...</Text>;
   }
+
+  const loadMoreOccurrences = async () => {
+    if (refreshing || !hasMore) {
+      return;
+    }
+    setRefreshing(true);
+
+    const newPage = currentPage + 1;
+
+    const { status, data } = await trackingsCtx.listOccurrences({
+      trackingId,
+      page: newPage,
+      perPage: OCCURRENCES_PER_PAGE,
+    });
+    if (status === 200) {
+      if (data.page >= data.totalPages) {
+        setHasMore(false);
+      }
+      setCurrentPage(newPage);
+      setOccurrences([...occurrences, ...data.occurrences]);
+    } else {
+      console.log("error on fetch occurrences:", status, data);
+    }
+    setRefreshing(false);
+  };
 
   const hideSnackbar = () => {
     setSnackbarMessage("");
@@ -132,7 +175,7 @@ export default function TrackingScreen({ navigation, route }) {
       trackingId,
       name,
     });
-    console.log("on handleSaveName status, data", status, data);
+
     if (status === 201) {
       setTracking((prevTracking) => ({ ...prevTracking, name }));
       hideModal();
@@ -206,12 +249,19 @@ export default function TrackingScreen({ navigation, route }) {
         <Text style={[styles.helpText, { color: colors.helpText }]}>
           Swipe left to remove an occurrence
         </Text>
-        {hasOccurrences &&
-          occurrences.map((occurrence) => (
-            <Text key={occurrence.occurrenceId} style={styles.occurrence}>
-              {occurrence.createdAt.toString()}
-            </Text>
-          ))}
+        {hasOccurrences && (
+          <FlatList
+            style={styles.listContainer}
+            data={occurrences}
+            keyExtractor={(item) => item.occurrenceId}
+            renderItem={({ item }) => (
+              <Text style={styles.occurrence}>{item.createdAt.toString()}</Text>
+            )}
+            ItemSeparatorComponent={() => <Divider />}
+            onEndReachedThreshold={0.2}
+            onEndReached={loadMoreOccurrences}
+          />
+        )}
         {!hasOccurrences && (
           <Text style={[styles.helpText, { color: colors.helpText }]}>
             No occurrences yet
@@ -249,6 +299,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   historyContainer: {
+    flex: 1,
     marginLeft: 20,
     marginTop: 20,
   },

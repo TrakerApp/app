@@ -155,7 +155,7 @@ export default function TrackingsScreen({ navigation }) {
           />
         )}
         ItemSeparatorComponent={() => <Divider />}
-        onEndReachedThreshold={0.4}
+        onEndReachedThreshold={0.2}
         onEndReached={trackingsCtx.loadMoreTrackings}
       />
       <Snackbar

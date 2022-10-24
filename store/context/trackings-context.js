@@ -107,13 +107,6 @@ export default function TrackingsContextProvider({ children }) {
       // error happened
       console.log("ERROR on listtrackings:", status);
     } else {
-      console.log(
-        "for page and perPage",
-        page,
-        perPage,
-        "returning trackings:",
-        data.trackings.map((t) => t.trackingId)
-      );
       // control unnecesarry re-fetching
       if (data.page >= data.totalPages) {
         setHasMore(false);
@@ -147,7 +140,6 @@ export default function TrackingsContextProvider({ children }) {
       return;
     }
 
-    console.log("triggered!");
     const newPage = currentPage + 1;
     const data = await listTrackings({
       page: newPage,
