@@ -2,6 +2,8 @@ import { createContext, useState, useEffect } from "react";
 import TrackingsApi from "../../util/trackingsApi";
 import { useAuthContext } from "./auth-context";
 
+const TRACKINGS_PER_PAGE = 15;
+
 export const TrackingsContext = createContext({
   trackings: [],
   createTracking: async ({ name }) => {},
@@ -10,28 +12,34 @@ export const TrackingsContext = createContext({
   listTrackings: async ({ page, perPage }) => {},
   findTracking: async (trackingId) => {},
   listOccurrences: async ({ trackingId, page, perPage }) => {},
+  loadMoreTrackings: async () => {},
 });
 
 const trackingsApi = async (authCtx) => {
-  const validToken = await authCtx.getValidIdToken()
+  const validToken = await authCtx.getValidIdToken();
 
   if (validToken) {
-    return new TrackingsApi(validToken)
+    return new TrackingsApi(validToken);
   } else {
-    return null
+    return null;
   }
-}
+};
 
 export default function TrackingsContextProvider({ children }) {
   const [trackings, setTrackings] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [refreshing, setRefreshing] = useState(false); // used for fetching more AND for refreshing
+  const [hasMore, setHasMore] = useState(true);
   const authCtx = useAuthContext();
 
   const createTracking = async ({ name }) => {
-    const apiClient = await trackingsApi(authCtx)
-    if (!apiClient) { return } // auth error: auth context does sign out automatically
+    const apiClient = await trackingsApi(authCtx);
+    if (!apiClient) {
+      return;
+    } // auth error: auth context does sign out automatically
     const res = await apiClient.createTracking({ name });
     const { status, data } = res;
-    console.log("result from createTracking:", status, data)
+    console.log("result from createTracking:", status, data);
 
     if (status === 201) {
       setTrackings((trackings) => [
@@ -47,11 +55,13 @@ export default function TrackingsContextProvider({ children }) {
   };
 
   const updateTracking = async ({ trackingId, name }) => {
-    const apiClient = await trackingsApi(authCtx)
-    if (!apiClient) { return } // auth error: auth context does sign out automatically
+    const apiClient = await trackingsApi(authCtx);
+    if (!apiClient) {
+      return;
+    } // auth error: auth context does sign out automatically
     const res = await apiClient.updateTracking({ trackingId, name });
     const { status, data } = res;
-    console.log("result from updateTracking:", status, data)
+    console.log("result from updateTracking:", status, data);
 
     if (status === 201) {
       setTrackings((trackings) => {
@@ -65,11 +75,13 @@ export default function TrackingsContextProvider({ children }) {
   };
 
   const track = async ({ trackingId }) => {
-    const apiClient = await trackingsApi(authCtx)
-    if (!apiClient) { return } // auth error: auth context does sign out automatically
+    const apiClient = await trackingsApi(authCtx);
+    if (!apiClient) {
+      return;
+    } // auth error: auth context does sign out automatically
     const res = await apiClient.track({ trackingId });
     const { status, data } = res;
-    console.log("result from track:", status, data)
+    console.log("result from track:", status, data);
 
     if (status === 201) {
       setTrackings((trackings) => {
@@ -82,9 +94,11 @@ export default function TrackingsContextProvider({ children }) {
     return res;
   };
 
-  const listTrackings = async ({ page = 1, perPage = 10 }) => {
-    const apiClient = await trackingsApi(authCtx)
-    if (!apiClient) { return } // auth error: auth context does sign out automatically
+  const listTrackings = async ({ page = 1, perPage = TRACKINGS_PER_PAGE }) => {
+    const apiClient = await trackingsApi(authCtx);
+    if (!apiClient) {
+      return;
+    } // auth error: auth context does sign out automatically
     const { status, data } = await apiClient.listTrackings({
       page,
       perPage,
@@ -92,29 +106,68 @@ export default function TrackingsContextProvider({ children }) {
     if (status >= 300) {
       // error happened
       console.log("ERROR on listtrackings:", status);
-      return data;
     } else {
-      return data;
+      console.log(
+        "for page and perPage",
+        page,
+        perPage,
+        "returning trackings:",
+        data.trackings.map((t) => t.trackingId)
+      );
+      // control unnecesarry re-fetching
+      if (data.page >= data.totalPages) {
+        setHasMore(false);
+      }
     }
+    return data;
   };
 
   const findTracking = async (trackingId) => {
-    const apiClient = await trackingsApi(authCtx)
-    if (!apiClient) { return } // auth error: auth context does sign out automatically
+    const apiClient = await trackingsApi(authCtx);
+    if (!apiClient) {
+      return;
+    } // auth error: auth context does sign out automatically
     return await apiClient.getTracking({ trackingId });
   };
 
   const listOccurrences = async ({ trackingId, page, perPage }) => {
-    const apiClient = await trackingsApi(authCtx)
-    if (!apiClient) { return } // auth error: auth context does sign out automatically
+    const apiClient = await trackingsApi(authCtx);
+    if (!apiClient) {
+      return;
+    } // auth error: auth context does sign out automatically
     return await apiClient.occurrences({ trackingId, page, perPage });
+  };
+
+  const loadMoreTrackings = async () => {
+    if (refreshing) {
+      return;
+    }
+    setRefreshing(true);
+    if (!hasMore) {
+      return;
+    }
+
+    console.log("triggered!");
+    const newPage = currentPage + 1;
+    const data = await listTrackings({
+      page: newPage,
+      perPage: TRACKINGS_PER_PAGE,
+    });
+    setTrackings((trackings) => [...trackings, ...data.trackings]);
+    setCurrentPage(newPage);
+    setRefreshing(false);
   };
 
   useEffect(() => {
     const load = async () => {
-      const { trackings } = await listTrackings({ page: 1, perPage: 10 });
+      setRefreshing(true);
+      const { trackings } = await listTrackings({
+        page: currentPage,
+        perPage: TRACKINGS_PER_PAGE,
+      });
 
       setTrackings(trackings);
+      setRefreshing(false);
     };
 
     load();
@@ -128,6 +181,7 @@ export default function TrackingsContextProvider({ children }) {
     listTrackings,
     findTracking,
     listOccurrences,
+    loadMoreTrackings,
   };
 
   return (
