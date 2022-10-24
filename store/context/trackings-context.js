@@ -4,6 +4,23 @@ import { useAuthContext } from "./auth-context";
 
 const TRACKINGS_PER_PAGE = 15;
 
+const trackingsSorter = (a, b) => {
+  // sort by lastOccurrenceAt
+  if (
+    !a.lastOccurrenceAt ||
+    !b.lastOccurrenceAt ||
+    a.lastOccurrenceAt === b.lastOccurrenceAt
+  ) {
+    return 0;
+  }
+  if (a.lastOccurrenceAt > b.lastOccurrenceAt) {
+    return -1;
+  }
+  if (a.lastOccurrenceAt < b.lastOccurrenceAt) {
+    return 1;
+  }
+}
+
 export const TrackingsContext = createContext({
   trackings: [],
   refreshing: false,
@@ -89,23 +106,7 @@ export default function TrackingsContextProvider({ children }) {
       setTrackings((trackings) => {
         const tracking = trackings.find((t) => t.trackingId === trackingId);
         tracking.lastOccurrenceAt = data.createdAt;
-        trackings = trackings.sort((a, b) => {
-          // sort by lastOccurrenceAt
-          if (
-            !a.lastOccurrenceAt ||
-            !b.lastOccurrenceAt ||
-            a.lastOccurrenceAt === b.lastOccurrenceAt
-          ) {
-            return 0;
-          }
-          if (a.lastOccurrenceAt > b.lastOccurrenceAt) {
-            return -1;
-          }
-          if (a.lastOccurrenceAt < b.lastOccurrenceAt) {
-            return 1;
-          }
-        });
-        return [...trackings];
+        return [...trackings.sort(trackingsSorter)];
       });
     }
 
@@ -187,7 +188,7 @@ export default function TrackingsContextProvider({ children }) {
           setTrackings((trackings) => {
             const tracking = trackings.find((t) => t.trackingId === trackingId);
             tracking.lastOccurrenceAt = data.occurrences[0]?.createdAt || null;
-            return [...trackings];
+            return [...trackings.sort(trackingsSorter)];
           });
         }
       }
