@@ -275,7 +275,7 @@ export default function TrackingScreen({ navigation, route }) {
     setLoading(true);
     const { status, data } = await trackingsCtx.removeOccurrence({
       trackingId,
-      occurrenceId: occurrence.occurrenceId,
+      occurrence,
     });
 
     if (status === 204) {

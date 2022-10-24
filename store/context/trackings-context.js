@@ -145,12 +145,30 @@ export default function TrackingsContextProvider({ children }) {
     return res;
   };
 
-  const removeOccurrence = async ({ trackingId, occurrenceId }) => {
+  const removeOccurrence = async ({ trackingId, occurrence }) => {
     const apiClient = await trackingsApi(authCtx);
     if (!apiClient) {
       return;
     } // auth error: auth context does sign out automatically
-    return await apiClient.removeOccurrence({ trackingId, occurrenceId });
+    const res = await apiClient.removeOccurrence({ trackingId, occurrenceId: occurrence.occurrenceId });
+    const currentLastOccurrenceAt = trackings.find((t) => t.trackingId === trackingId).lastOccurrenceAt;
+
+    if (res.status === 204) {
+      // check if occurrence.createdAt is the same as tracking.lastOccurrenceAt, and if it is, we need the new lastOccurrenceAt (previous or never)
+      if (occurrence.createdAt === currentLastOccurrenceAt) {
+        const { status, data } = await listOccurrences({ trackingId, page: 1, perPage: 1 });
+
+        if (status === 200) {
+          setTrackings((trackings) => {
+            const tracking = trackings.find((t) => t.trackingId === trackingId);
+            tracking.lastOccurrenceAt = data.occurrences[0]?.createdAt || null;
+            return [...trackings];
+          })
+        }
+      }
+    }
+
+    return res
   };
 
   const listOccurrences = async ({ trackingId, page, perPage }) => {
