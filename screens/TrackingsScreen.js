@@ -114,7 +114,7 @@ export default function TrackingsScreen({ navigation }) {
     if (status === 201) {
       // hide modal
       hideModal();
-      setSnackbarMessage(MESSAGES.TrackingCreated);
+      navigation.navigate("Tracking", { trackingId: data.trackingId, name: tracking.name });
     } else {
       setError(
         data.error.toString().match(/tracking.name.already.exists/)
