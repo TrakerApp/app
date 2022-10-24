@@ -95,6 +95,7 @@ export default function TrackingsScreen({ navigation }) {
     setTrackingModalVisible(true);
   };
   const hideModal = () => {
+    setError("");
     setTrackingModalVisible(false);
   };
   const hideSnackbar = () => {
