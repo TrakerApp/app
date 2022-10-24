@@ -12,6 +12,7 @@ import {
 import { TrackingsContext } from "../store/context/trackings-context";
 import useColors from "../util/hooks/useColors";
 import TrackingForm from "../components/TrackingForm";
+import { localTime } from "../util/localTime";
 
 const MESSAGES = {
   TrackingUpdated: "Tracking name changed",
@@ -255,7 +256,7 @@ export default function TrackingScreen({ navigation, route }) {
             data={occurrences}
             keyExtractor={(item) => item.occurrenceId}
             renderItem={({ item }) => (
-              <Text style={styles.occurrence}>{item.createdAt.toString()}</Text>
+              <Text style={styles.occurrence}>{localTime(item.createdAt)}</Text>
             )}
             ItemSeparatorComponent={() => <Divider />}
             onEndReachedThreshold={0.2}

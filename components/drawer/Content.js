@@ -21,7 +21,7 @@ export default function DrawerContent() {
         </Button>
       </View>
       <View style={styles.themeSwitchContainer}>
-        <Text>Dark Theme</Text>
+        <Text style={styles.darkThemeTitle}>Dark Theme</Text>
         <Switch
           value={preferencesContext.isThemeDark}
           onValueChange={() => {
@@ -44,6 +44,10 @@ const styles = StyleSheet.create({
   themeSwitchContainer: {
     paddingTop: 20,
     alignItems: "center",
+  },
+  darkThemeTitle: {
+    fontSize: 16,
+    marginBottom: 8
   },
   username: {
     fontSize: 16,

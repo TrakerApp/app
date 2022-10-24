@@ -7,6 +7,7 @@ const LIGHT_COLORS = {
 	normalBackground: "#f2f2f2",
 	normalBorder: "#c8c8c8",
 	modalBackground: "white",
+	refreshIndicator: "#999",
 }
 
 const DARK_COLORS = {
@@ -15,6 +16,7 @@ const DARK_COLORS = {
 	normalBackground: "#010101",
 	modalBackground: "#333",
 	normalBorder: "#313131",
+	refreshIndicator: "#fff",
 }
 
 

@@ -18,6 +18,7 @@ import TrackingListItem from "../components/TrackingListItem";
 import { Swipeable } from "react-native-gesture-handler";
 import TrackingForm from "../components/TrackingForm";
 import { TrackingsContext } from "../store/context/trackings-context";
+import useColors from "../util/hooks/useColors";
 
 const MESSAGES = {
   TrackingCreated: "Tracking added",
@@ -88,6 +89,7 @@ export default function TrackingsScreen({ navigation }) {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [error, setError] = useState("");
   const trackingsCtx = useContext(TrackingsContext);
+  const colors = useColors()
 
   const showModal = () => {
     setTrackingModalVisible(true);
@@ -159,7 +161,7 @@ export default function TrackingsScreen({ navigation }) {
           />
         </Modal>
       </Portal>
-      {trackingsCtx.trackings.length === 0 ? (
+      {trackingsCtx.trackings.length === 0 && !trackingsCtx.refreshing ? (
         <NoTrackingsView />
       ) : (
         <>
@@ -169,6 +171,7 @@ export default function TrackingsScreen({ navigation }) {
             data={trackingsCtx.trackings}
             refreshControl={
               <RefreshControl
+                tintColor={colors.refreshIndicator}
                 refreshing={trackingsCtx.refreshing}
                 onRefresh={trackingsCtx.refreshTrackings}
               />
