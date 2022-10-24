@@ -5,7 +5,7 @@ import {
   useState,
   useRef,
 } from "react";
-import { FlatList, StyleSheet, Animated, View } from "react-native";
+import { FlatList, StyleSheet, Animated, View, Alert } from "react-native";
 import {
   Button,
   IconButton,
@@ -55,6 +55,24 @@ function swipeableRightActions(progress, dragX) {
     >
       <Text style={styles.deleteSwipeButton}>Delete</Text>
     </Animated.View>
+  );
+}
+
+function removeOccurrenceAlert({ occurrence, onRemove }) {
+  return Alert.alert(
+    "Remove Occurrence",
+    `Are you sure you want to remove the occurrence happening on ${localTime(occurrence.createdAt)}?`,
+    [
+      {
+        text: "Yes, remove",
+        onPress: onRemove,
+        style: "destructive",
+      },
+      {
+        text: "Cancel",
+        style: "cancel"
+      },
+    ]
   );
 }
 
@@ -250,7 +268,7 @@ export default function TrackingScreen({ navigation, route }) {
     return { status, data };
   };
 
-  const handleRemoveOccurrence = async (occurrence) => {
+  const removeOccurrence = async (occurrence) => {
     setLoading(true);
     const { status, data } = await trackingsCtx.removeOccurrence({
       trackingId,
@@ -269,6 +287,10 @@ export default function TrackingScreen({ navigation, route }) {
       setSnackbarMessage(MESSAGES.error);
     }
     setLoading(false);
+  }
+
+  const handleRemoveOccurrence = (occurrence) => {
+    removeOccurrenceAlert({ occurrence, onRemove: removeOccurrence.bind(this, occurrence) });
   };
 
   const hasOccurrences = occurrences.length > 0;
