@@ -16,7 +16,7 @@ export const TrackingsContext = createContext({
   loadMoreTrackings: async () => {},
   refreshTrackings: async () => {},
   removeOccurrence: async ({ trackingId, occurrenceId }) => {},
-  deleteTracking: async ({ trackingId }) => {},
+  removeTracking: async ({ trackingId }) => {},
 });
 
 const trackingsApi = async (authCtx) => {
@@ -127,14 +127,14 @@ export default function TrackingsContextProvider({ children }) {
     return await apiClient.getTracking({ trackingId });
   };
 
-  const deleteTracking = async ({ trackingId }) => {
+  const removeTracking = async ({ trackingId }) => {
     const apiClient = await trackingsApi(authCtx);
     if (!apiClient) {
       return;
     } // auth error: auth context does sign out automatically
-    const res = await apiClient.deleteTracking({ trackingId });
+    const res = await apiClient.removeTracking({ trackingId });
     const { status, data } = res;
-    console.log("result from deleteTracking:", status, data);
+    console.log("result from removeTracking:", status, data);
 
     if (status === 204) {
       setTrackings((trackings) => {
@@ -218,7 +218,7 @@ export default function TrackingsContextProvider({ children }) {
     refreshing,
     refreshTrackings,
     removeOccurrence,
-    deleteTracking,
+    removeTracking,
   };
 
   return (

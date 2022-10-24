@@ -61,7 +61,9 @@ function swipeableRightActions(progress, dragX) {
 function removeOccurrenceAlert({ occurrence, onRemove }) {
   return Alert.alert(
     "Remove Occurrence",
-    `Are you sure you want to remove the occurrence happening on ${localTime(occurrence.createdAt)}?`,
+    `Are you sure you want to remove the occurrence happening on ${localTime(
+      occurrence.createdAt
+    )}?`,
     [
       {
         text: "Yes, remove",
@@ -70,7 +72,25 @@ function removeOccurrenceAlert({ occurrence, onRemove }) {
       },
       {
         text: "Cancel",
-        style: "cancel"
+        style: "cancel",
+      },
+    ]
+  );
+}
+
+function removeTrackingAlert({ tracking, onRemove }) {
+  return Alert.alert(
+    "Remove Tracking",
+    `Are you sure you want to delete "${tracking?.name}"? All the occurrences will be removed as well, and it's not recoverable.`,
+    [
+      {
+        text: "Yes, remove",
+        onPress: onRemove,
+        style: "destructive",
+      },
+      {
+        text: "Cancel",
+        style: "cancel",
       },
     ]
   );
@@ -113,20 +133,6 @@ export default function TrackingScreen({ navigation, route }) {
   const colors = useColors();
   const { trackingId, name } = route.params;
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerLeft: () => (
-        <IconButton
-          size={32}
-          icon="chevron-left"
-          onPress={() => {
-            navigation.goBack();
-          }}
-        />
-      ),
-    });
-  }, [navigation]);
-
   // reset state
   useLayoutEffect(() => {
     setOccurrences([]);
@@ -163,6 +169,7 @@ export default function TrackingScreen({ navigation, route }) {
       });
   };
 
+  // setting initial values before loading
   useLayoutEffect(() => {
     setLoading(true);
     setRefreshing(true);
@@ -179,10 +186,6 @@ export default function TrackingScreen({ navigation, route }) {
   useEffect(() => {
     refreshScreen();
   }, [trackingId]);
-
-  if (!tracking) {
-    return <Text>Loading...</Text>;
-  }
 
   const loadMoreOccurrences = async () => {
     if (refreshing || !hasMore) {
@@ -287,13 +290,64 @@ export default function TrackingScreen({ navigation, route }) {
       setSnackbarMessage(MESSAGES.error);
     }
     setLoading(false);
-  }
-
-  const handleRemoveOccurrence = (occurrence) => {
-    removeOccurrenceAlert({ occurrence, onRemove: removeOccurrence.bind(this, occurrence) });
   };
 
+  const handleRemoveOccurrence = (occurrence) => {
+    removeOccurrenceAlert({
+      occurrence,
+      onRemove: removeOccurrence.bind(this, occurrence),
+    });
+  };
+
+  const removeTracking = async () => {
+    setLoading(true);
+    const { status, data } = await trackingsCtx.removeTracking({
+      trackingId,
+    });
+
+    if (status === 204) {
+      navigation.goBack();
+    } else {
+      console.log(
+        "error on TrackingScreen.handleRemoveTracking:",
+        status,
+        data
+      );
+      setSnackbarMessage(MESSAGES.error);
+    }
+    setLoading(false);
+  };
+
+  const handleRemoveTracking = async () => {
+    removeTrackingAlert({
+      tracking,
+      onRemove: removeTracking,
+    });
+  };
+
+  // set navigation options on header
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerLeft: () => (
+        <IconButton
+          size={32}
+          icon="chevron-left"
+          onPress={() => {
+            navigation.goBack();
+          }}
+        />
+      ),
+      headerRight: () => (
+        <IconButton size={28} icon="trash-can-outline" onPress={handleRemoveTracking} />
+      ),
+    });
+  }, [trackingId]);
+
   const hasOccurrences = occurrences.length > 0;
+
+  if (!tracking) {
+    return <Text>Loading...</Text>;
+  }
 
   return (
     <View style={styles.rootContainer}>

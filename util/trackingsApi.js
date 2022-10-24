@@ -85,7 +85,7 @@ export default class TrackingsApi {
     });
   }
 
-  async deleteTracking({ trackingId }) {
+  async removeTracking({ trackingId }) {
     return await this.makeRequest({
       method: "delete",
       path: `trackings/${trackingId}`
