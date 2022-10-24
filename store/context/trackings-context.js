@@ -4,22 +4,26 @@ import { useAuthContext } from "./auth-context";
 
 const TRACKINGS_PER_PAGE = 15;
 
-const trackingsSorter = (a, b) => {
-  // sort by lastOccurrenceAt
-  if (
-    !a.lastOccurrenceAt ||
-    !b.lastOccurrenceAt ||
-    a.lastOccurrenceAt === b.lastOccurrenceAt
-  ) {
-    return 0;
-  }
-  if (a.lastOccurrenceAt > b.lastOccurrenceAt) {
-    return -1;
-  }
-  if (a.lastOccurrenceAt < b.lastOccurrenceAt) {
-    return 1;
-  }
-}
+const sortTrackings = (trackings) => {
+  return trackings.sort((a, b) => {
+    // sort by lastOccurrenceAt
+    if (
+      !a.lastOccurrenceAt ||
+      !b.lastOccurrenceAt ||
+      a.lastOccurrenceAt === b.lastOccurrenceAt
+    ) {
+      return 0;
+    }
+    const aDate = new Date(a.lastOccurrenceAt);
+    const bDate = new Date(b.lastOccurrenceAt);
+    if (aDate > bDate) {
+      return -1;
+    }
+    if (aDate < bDate) {
+      return 1;
+    }
+  });
+};
 
 export const TrackingsContext = createContext({
   trackings: [],
@@ -81,7 +85,6 @@ export default function TrackingsContextProvider({ children }) {
     } // auth error: auth context does sign out automatically
     const res = await apiClient.updateTracking({ trackingId, name });
     const { status, data } = res;
-    console.log("result from updateTracking:", status, data);
 
     if (status === 201) {
       setTrackings((trackings) => {
@@ -106,7 +109,7 @@ export default function TrackingsContextProvider({ children }) {
       setTrackings((trackings) => {
         const tracking = trackings.find((t) => t.trackingId === trackingId);
         tracking.lastOccurrenceAt = data.createdAt;
-        return [...trackings.sort(trackingsSorter)];
+        return [...sortTrackings(trackings)];
       });
     }
 
@@ -149,7 +152,6 @@ export default function TrackingsContextProvider({ children }) {
     } // auth error: auth context does sign out automatically
     const res = await apiClient.removeTracking({ trackingId });
     const { status, data } = res;
-    console.log("result from removeTracking:", status, data);
 
     if (status === 204) {
       setTrackings((trackings) => {
@@ -188,7 +190,7 @@ export default function TrackingsContextProvider({ children }) {
           setTrackings((trackings) => {
             const tracking = trackings.find((t) => t.trackingId === trackingId);
             tracking.lastOccurrenceAt = data.occurrences[0]?.createdAt || null;
-            return [...trackings.sort(trackingsSorter)];
+            return [...sortTrackings(trackings)];
           });
         }
       }
@@ -228,9 +230,11 @@ export default function TrackingsContextProvider({ children }) {
       page: newPage,
       perPage: TRACKINGS_PER_PAGE,
     });
-    const existingTrackings = trackings.map(t => t.trackingId)
+    const existingTrackings = trackings.map((t) => t.trackingId);
     // we need to exclude any new tracking that is already on the list, because it was created recently
-    const newTrackings = data.trackings.filter(t => !existingTrackings.includes(t.trackingId))
+    const newTrackings = data.trackings.filter(
+      (t) => !existingTrackings.includes(t.trackingId)
+    );
     setTrackings((trackings) => [...trackings, ...newTrackings]);
     setCurrentPage(newPage);
     setRefreshing(false);
