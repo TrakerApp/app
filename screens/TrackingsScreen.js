@@ -1,5 +1,5 @@
 import { useContext, useLayoutEffect, useRef, useState } from "react";
-import { StyleSheet, SafeAreaView, FlatList, Animated } from "react-native";
+import { StyleSheet, SafeAreaView, FlatList, Animated, RefreshControl } from "react-native";
 import {
   IconButton,
   Text,
@@ -147,6 +147,12 @@ export default function TrackingsScreen({ navigation }) {
       <FlatList
         style={styles.listContainer}
         data={trackingsCtx.trackings}
+        refreshControl={
+            <RefreshControl
+              refreshing={trackingsCtx.refreshing}
+              onRefresh={trackingsCtx.refreshTrackings}
+            />
+          }
         keyExtractor={(item) => item.trackingId}
         renderItem={({ item }) => (
           <TrackingListItemSwipeable

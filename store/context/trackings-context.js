@@ -6,6 +6,7 @@ const TRACKINGS_PER_PAGE = 15;
 
 export const TrackingsContext = createContext({
   trackings: [],
+  refreshing: false,
   createTracking: async ({ name }) => {},
   updateTracking: async ({ trackingId, name }) => {},
   track: async ({ trackingId }) => {},
@@ -13,6 +14,7 @@ export const TrackingsContext = createContext({
   findTracking: async (trackingId) => {},
   listOccurrences: async ({ trackingId, page, perPage }) => {},
   loadMoreTrackings: async () => {},
+  refreshTrackings: async () => {},
 });
 
 const trackingsApi = async (authCtx) => {
@@ -115,6 +117,15 @@ export default function TrackingsContextProvider({ children }) {
     return data;
   };
 
+  const refreshTrackings = async () => {
+    setRefreshing(true);
+    setHasMore(true);
+    setCurrentPage(1);
+    const data = await listTrackings({ page: 1, perPage: TRACKINGS_PER_PAGE });
+    setTrackings(data.trackings);
+    setRefreshing(false);
+  }
+
   const findTracking = async (trackingId) => {
     const apiClient = await trackingsApi(authCtx);
     if (!apiClient) {
@@ -174,6 +185,8 @@ export default function TrackingsContextProvider({ children }) {
     findTracking,
     listOccurrences,
     loadMoreTrackings,
+    refreshing,
+    refreshTrackings,
   };
 
   return (
