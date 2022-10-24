@@ -14,7 +14,7 @@ export default function TrackingListItem({
   const colors = useColors;
 
   const handlePress = () => {
-    navigation.navigate("Tracking", { trackingId, name });
+    navigation.navigate("Tracking", { trackingId, name, lastOccurrenceAt });
   };
 
   return (

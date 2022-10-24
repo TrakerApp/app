@@ -131,14 +131,14 @@ export default function TrackingScreen({ navigation, route }) {
   const [hasMore, setHasMore] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const colors = useColors();
-  const { trackingId, name } = route.params;
+  const { trackingId, name, lastOccurrenceAt } = route.params;
 
   // reset state
   useLayoutEffect(() => {
     setOccurrences([]);
     setCurrentPage(1);
     setHasMore(true);
-  }, [trackingId]);
+  }, [trackingId, lastOccurrenceAt]);
 
   const refreshScreen = () => {
     setLoading(true);
@@ -185,7 +185,7 @@ export default function TrackingScreen({ navigation, route }) {
 
   useEffect(() => {
     refreshScreen();
-  }, [trackingId]);
+  }, [trackingId, lastOccurrenceAt]);
 
   const loadMoreOccurrences = async () => {
     if (refreshing || !hasMore) {
