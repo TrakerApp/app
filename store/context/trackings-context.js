@@ -15,6 +15,8 @@ export const TrackingsContext = createContext({
   listOccurrences: async ({ trackingId, page, perPage }) => {},
   loadMoreTrackings: async () => {},
   refreshTrackings: async () => {},
+  removeOccurrence: async ({ trackingId, occurrenceId }) => {},
+  deleteTracking: async ({ trackingId }) => {},
 });
 
 const trackingsApi = async (authCtx) => {
@@ -117,15 +119,6 @@ export default function TrackingsContextProvider({ children }) {
     return data;
   };
 
-  const refreshTrackings = async () => {
-    setRefreshing(true);
-    setHasMore(true);
-    setCurrentPage(1);
-    const data = await listTrackings({ page: 1, perPage: TRACKINGS_PER_PAGE });
-    setTrackings(data.trackings);
-    setRefreshing(false);
-  }
-
   const findTracking = async (trackingId) => {
     const apiClient = await trackingsApi(authCtx);
     if (!apiClient) {
@@ -134,12 +127,53 @@ export default function TrackingsContextProvider({ children }) {
     return await apiClient.getTracking({ trackingId });
   };
 
+  const deleteTracking = async ({ trackingId }) => {
+    const apiClient = await trackingsApi(authCtx);
+    if (!apiClient) {
+      return;
+    } // auth error: auth context does sign out automatically
+    const res = await apiClient.deleteTracking({ trackingId });
+    const { status, data } = res;
+    console.log("result from deleteTracking:", status, data);
+
+    if (status === 204) {
+      setTrackings((trackings) => {
+        const index = trackings.findIndex((t) => t.trackingId === trackingId);
+        trackings.splice(index, 1);
+        return [...trackings];
+      });
+    }
+
+    return res;
+  };
+
+  const removeOccurrence = async ({ trackingId, occurrenceId }) => {
+    const apiClient = await trackingsApi(authCtx);
+    if (!apiClient) {
+      return;
+    } // auth error: auth context does sign out automatically
+    const res = await apiClient.removeOccurrence({ trackingId, occurrenceId });
+    const { status, data } = res;
+    console.log("result from removeOccurrence:", status, data);
+
+    return res;
+  };
+
   const listOccurrences = async ({ trackingId, page, perPage }) => {
     const apiClient = await trackingsApi(authCtx);
     if (!apiClient) {
       return;
     } // auth error: auth context does sign out automatically
     return await apiClient.occurrences({ trackingId, page, perPage });
+  };
+
+  const refreshTrackings = async () => {
+    setRefreshing(true);
+    setHasMore(true);
+    setCurrentPage(1);
+    const data = await listTrackings({ page: 1, perPage: TRACKINGS_PER_PAGE });
+    setTrackings(data.trackings);
+    setRefreshing(false);
   };
 
   const loadMoreTrackings = async () => {
@@ -187,6 +221,8 @@ export default function TrackingsContextProvider({ children }) {
     loadMoreTrackings,
     refreshing,
     refreshTrackings,
+    removeOccurrence,
+    deleteTracking,
   };
 
   return (

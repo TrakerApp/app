@@ -60,10 +60,24 @@ export default class TrackingsApi {
     });
   }
 
+  async removeOccurrence({ trackingId, occurrenceId }) {
+    return await this.makeRequest({
+      method: "delete",
+      path: `trackings/${trackingId}/occurrences/${occurrenceId}`
+    });
+  }
+
   async track({ trackingId }) {
     return await this.makeRequest({
       method: "post",
       path: `trackings/${trackingId}/track`,
+    });
+  }
+
+  async deleteTracking({ trackingId }) {
+    return await this.makeRequest({
+      method: "delete",
+      path: `trackings/${trackingId}`
     });
   }
 
