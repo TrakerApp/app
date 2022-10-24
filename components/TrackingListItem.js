@@ -20,7 +20,6 @@ export default function TrackingListItem({ trackingId, name, lastOccurrenceAt })
           styles.rootContainer,
           {
             backgroundColor: colors.normalBackground,
-            borderRightColor: colors.normalBorder,
           },
         ]}
       >
@@ -39,10 +38,9 @@ const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
     paddingLeft: 14,
-    paddingVertical: 6,
+    paddingVertical: 8,
     justifyContent: "center",
     minHeight: 50,
-    borderRightWidth: 1,
   },
   name: {
     fontSize: 18,

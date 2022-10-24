@@ -1,5 +1,5 @@
 import { useContext, useLayoutEffect, useRef, useState } from "react";
-import { StyleSheet, SafeAreaView, FlatList, View } from "react-native";
+import { StyleSheet, SafeAreaView, FlatList, Animated } from "react-native";
 import {
   IconButton,
   Text,
@@ -20,14 +20,21 @@ const MESSAGES = {
 };
 
 function swipeableRightActions(progress, dragX) {
-  // const trans = dragX.interpolate({
-  //   inputRange: [0, 50, 100, 101],
-  //   outputRange: [-20, 0, 0, 1],
-  // });
+  const transform = dragX.interpolate({
+    inputRange: [-101, -100, 0],
+    outputRange: [0, 0, 100],
+  });
   return (
-    <View style={styles.swipeableActionsContainer}>
-      <Text style={{}}>TRACK</Text>
-    </View>
+    <Animated.View
+      style={[
+        styles.swipeableActionsContainer,
+        {
+          transform: [{ translateX: transform }],
+        },
+      ]}
+    >
+      <Text style={styles.trackSwipeButton}>TRACK</Text>
+    </Animated.View>
   );
 }
 
@@ -183,8 +190,13 @@ const styles = StyleSheet.create({
   },
   swipeableActionsContainer: {
     width: 100,
+    backgroundColor: "#4caf50",
     justifyContent: "center",
-    alignItems: "flex-end",
-    paddingRight: 10,
+    alignItems: "center",
+  },
+  trackSwipeButton: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
