@@ -102,7 +102,7 @@ export default function TrackingForm({
       {showHelp && (
         <View style={styles.examplesContainer}>
           <Text style={[styles.exampleTitle, { color: colors.softText1 }]}>
-            Enter the name of the action, event or occurrence that you want to
+            Enter the name of the habit, event or occurrence that you want to
             track.
           </Text>
           <Text style={[styles.exampleTitle, { color: colors.softText1 }]}>

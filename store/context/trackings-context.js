@@ -43,7 +43,6 @@ export default function TrackingsContextProvider({ children }) {
     } // auth error: auth context does sign out automatically
     const res = await apiClient.createTracking({ name });
     const { status, data } = res;
-    console.log("result from createTracking:", status, data);
 
     if (status === 201) {
       setTrackings((trackings) => [
@@ -85,7 +84,6 @@ export default function TrackingsContextProvider({ children }) {
     } // auth error: auth context does sign out automatically
     const res = await apiClient.track({ trackingId });
     const { status, data } = res;
-    console.log("result from track:", status, data);
 
     if (status === 201) {
       setTrackings((trackings) => {
@@ -176,10 +174,10 @@ export default function TrackingsContextProvider({ children }) {
     if (refreshing) {
       return;
     }
-    setRefreshing(true);
     if (!hasMore) {
       return;
     }
+    setRefreshing(true);
 
     const newPage = currentPage + 1;
     const data = await listTrackings({

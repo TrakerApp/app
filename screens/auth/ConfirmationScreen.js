@@ -34,7 +34,6 @@ export default function ConfirmationScreen({ navigation, route }) {
     console.log("LOADING THE LISTENING HUB");
     listenToAutoSignIn()
       .then((data) => {
-        console.log("user from auth received in handleConfirmPress:", data);
         if (data.error === "AutoSignInFailed") {
           // This happens when user creates two accounts and confirms the first one, I think the stored token is from the last one so it can't be confirmed
           navigation.navigate("SignIn", {

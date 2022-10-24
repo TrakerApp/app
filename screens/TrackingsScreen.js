@@ -48,9 +48,8 @@ function swipeableRightActions(progress, dragX) {
 function NoTrackingsView() {
   return (
     <Text style={styles.noTrackingsText}>
-      You don't have any tracking yet, you can add behaviours or habits that you
-      want to keep track of by clicking on the plus icon on the top right
-      corner.
+      Start by adding behaviours or habits that you want to keep track of by
+      clicking on the plus icon on the top right corner.
     </Text>
   );
 }
@@ -89,7 +88,7 @@ export default function TrackingsScreen({ navigation }) {
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [error, setError] = useState("");
   const trackingsCtx = useContext(TrackingsContext);
-  const colors = useColors()
+  const colors = useColors();
 
   const showModal = () => {
     setTrackingModalVisible(true);

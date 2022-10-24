@@ -1,4 +1,5 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const PreferencesContext = createContext({
   toggleTheme: () => {},
@@ -10,8 +11,27 @@ export const usePreferencesContext = () => useContext(PreferencesContext);
 export default function PreferencesContextProvider({ children }) {
   const [isThemeDark, setIsThemeDark] = useState(false);
 
+  const loadPreferences = async () => {
+    const theme = await AsyncStorage.getItem('theme');
+    console.log("loading prefs! theme:", theme)
+    if (theme) {
+      setIsThemeDark(theme === 'dark');
+    }
+  };
+
+  const storePreferences = ({ theme }) => {
+    console.log("storing prefs! theme:", theme)
+    AsyncStorage.setItem('theme', theme);
+  }
+
+  useEffect(() => {
+    loadPreferences();
+  }, [])
+
   const toggleTheme = () => {
-    setIsThemeDark((isDark) => !isDark);
+    const currentThemeIsDark = isThemeDark
+    storePreferences({ theme: !currentThemeIsDark ? 'dark' : 'light' });
+    setIsThemeDark(!currentThemeIsDark);
   };
 
   return (
