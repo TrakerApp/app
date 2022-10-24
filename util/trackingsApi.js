@@ -9,6 +9,8 @@ export default class TrackingsApi {
   makeRequest({ path, data = {}, method }) {
     if (method === "get") {
       return this.makeGetRequest({ path, data });
+    } else if (method === "delete") {
+      return this.makeDeleteRequest({ path });
     } else {
       return axios[method](`${BASE_API_URL}/${path}`, data, {
         headers: {
@@ -22,6 +24,15 @@ export default class TrackingsApi {
   makeGetRequest({ path, data = {} }) {
     return axios.get(`${BASE_API_URL}/${path}`, {
       params: data,
+      headers: {
+        Authorization: this.token,
+      },
+      validateStatus: () => true,
+    });
+  }
+
+  makeDeleteRequest({ path }) {
+    return axios.delete(`${BASE_API_URL}/${path}`, {
       headers: {
         Authorization: this.token,
       },

@@ -1,5 +1,11 @@
-import { useContext, useEffect, useLayoutEffect, useState } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import {
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useState,
+  useRef,
+} from "react";
+import { FlatList, StyleSheet, Animated, View } from "react-native";
 import {
   Button,
   IconButton,
@@ -12,11 +18,13 @@ import {
 import { TrackingsContext } from "../store/context/trackings-context";
 import useColors from "../util/hooks/useColors";
 import TrackingForm from "../components/TrackingForm";
+import { Swipeable } from "react-native-gesture-handler";
 import { localTime } from "../util/localTime";
 
 const MESSAGES = {
   TrackingUpdated: "Tracking name changed",
   Tracked: "Tracked successfully",
+  OccurrenceRemoved: "Occurrence removed",
   error: "There was an error on your request, please try again later",
 };
 
@@ -30,6 +38,48 @@ const getPluralSingular = (count, singular, plural) => {
   const text = count === 1 ? singular : plural;
   return `${count} ${text}`;
 };
+
+function swipeableRightActions(progress, dragX) {
+  const transform = dragX.interpolate({
+    inputRange: [-101, -100, 0],
+    outputRange: [0, 0, 100],
+  });
+  return (
+    <Animated.View
+      style={[
+        styles.swipeableActionsContainer,
+        {
+          transform: [{ translateX: transform }],
+        },
+      ]}
+    >
+      <Text style={styles.deleteSwipeButton}>Delete</Text>
+    </Animated.View>
+  );
+}
+
+function OccurrenceItemSwipeable({ onSwipeRight, occurrence }) {
+  const swipeableRef = useRef(null);
+
+  const handleSwipe = (direction) => {
+    if (direction === "right") {
+      onSwipeRight(occurrence);
+      swipeableRef.current.close();
+    }
+  };
+
+  return (
+    <Swipeable
+      ref={swipeableRef}
+      renderRightActions={swipeableRightActions}
+      leftThreshold={100}
+      rightThreshold={100}
+      onSwipeableOpen={handleSwipe}
+    >
+      <Text style={styles.occurrence}>{localTime(occurrence.createdAt)}</Text>
+    </Swipeable>
+  );
+}
 
 export default function TrackingScreen({ navigation, route }) {
   const trackingsCtx = useContext(TrackingsContext);
@@ -66,20 +116,11 @@ export default function TrackingScreen({ navigation, route }) {
     setHasMore(true);
   }, [trackingId]);
 
-  useLayoutEffect(() => {
+  const refreshScreen = () => {
     setLoading(true);
     setRefreshing(true);
-    // real data is loaded below after "loading"
-    setTracking({
-      trackingId,
-      name,
-      todayOccurrences: null,
-      weekOccurrences: null,
-    });
-    setOccurrences([]);
-  }, [trackingId, name]);
-
-  useEffect(() => {
+    setCurrentPage(1);
+    setHasMore(true);
     trackingsCtx.findTracking(trackingId).then((res) => {
       const { status, data } = res;
       if (status === 200) {
@@ -102,6 +143,23 @@ export default function TrackingScreen({ navigation, route }) {
         setLoading(false);
         setRefreshing(false);
       });
+  };
+
+  useLayoutEffect(() => {
+    setLoading(true);
+    setRefreshing(true);
+    // real data is loaded below after "loading"
+    setTracking({
+      trackingId,
+      name,
+      todayOccurrences: null,
+      weekOccurrences: null,
+    });
+    setOccurrences([]);
+  }, [trackingId, name]);
+
+  useEffect(() => {
+    refreshScreen();
   }, [trackingId]);
 
   if (!tracking) {
@@ -192,6 +250,27 @@ export default function TrackingScreen({ navigation, route }) {
     return { status, data };
   };
 
+  const handleRemoveOccurrence = async (occurrence) => {
+    setLoading(true);
+    const { status, data } = await trackingsCtx.removeOccurrence({
+      trackingId,
+      occurrenceId: occurrence.occurrenceId,
+    });
+
+    if (status === 204) {
+      refreshScreen();
+      setSnackbarMessage(MESSAGES.OccurrenceRemoved);
+    } else {
+      console.log(
+        "error on TrackingScreen.handleRemoveOccurrence:",
+        status,
+        data
+      );
+      setSnackbarMessage(MESSAGES.error);
+    }
+    setLoading(false);
+  };
+
   const hasOccurrences = occurrences.length > 0;
 
   return (
@@ -256,7 +335,10 @@ export default function TrackingScreen({ navigation, route }) {
             data={occurrences}
             keyExtractor={(item) => item.occurrenceId}
             renderItem={({ item }) => (
-              <Text style={styles.occurrence}>{localTime(item.createdAt)}</Text>
+              <OccurrenceItemSwipeable
+                occurrence={item}
+                onSwipeRight={handleRemoveOccurrence}
+              />
             )}
             ItemSeparatorComponent={() => <Divider />}
             onEndReachedThreshold={0.2}
@@ -329,7 +411,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 5,
   },
+  swipeableActionsContainer: {
+    width: 100,
+    backgroundColor: "red",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  deleteSwipeButton: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
   occurrence: {
-    paddingVertical: 6,
+    paddingVertical: 10,
   },
 });

@@ -152,11 +152,7 @@ export default function TrackingsContextProvider({ children }) {
     if (!apiClient) {
       return;
     } // auth error: auth context does sign out automatically
-    const res = await apiClient.removeOccurrence({ trackingId, occurrenceId });
-    const { status, data } = res;
-    console.log("result from removeOccurrence:", status, data);
-
-    return res;
+    return await apiClient.removeOccurrence({ trackingId, occurrenceId });
   };
 
   const listOccurrences = async ({ trackingId, page, perPage }) => {
