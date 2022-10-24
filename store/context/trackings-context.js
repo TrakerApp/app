@@ -228,7 +228,10 @@ export default function TrackingsContextProvider({ children }) {
       page: newPage,
       perPage: TRACKINGS_PER_PAGE,
     });
-    setTrackings((trackings) => [...trackings, ...data.trackings]);
+    const existingTrackings = trackings.map(t => t.trackingId)
+    // we need to exclude any new tracking that is already on the list, because it was created recently
+    const newTrackings = data.trackings.filter(t => !existingTrackings.includes(t.trackingId))
+    setTrackings((trackings) => [...trackings, ...newTrackings]);
     setCurrentPage(newPage);
     setRefreshing(false);
   };
