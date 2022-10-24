@@ -1,5 +1,11 @@
 import { useContext, useLayoutEffect, useRef, useState } from "react";
-import { StyleSheet, SafeAreaView, FlatList, Animated, RefreshControl } from "react-native";
+import {
+  StyleSheet,
+  SafeAreaView,
+  FlatList,
+  Animated,
+  RefreshControl,
+} from "react-native";
 import {
   IconButton,
   Text,
@@ -35,6 +41,16 @@ function swipeableRightActions(progress, dragX) {
     >
       <Text style={styles.trackSwipeButton}>TRACK</Text>
     </Animated.View>
+  );
+}
+
+function NoTrackingsView() {
+  return (
+    <Text style={styles.noTrackingsText}>
+      You don't have any tracking yet, you can add behaviours or habits that you
+      want to keep track of by clicking on the plus icon on the top right
+      corner.
+    </Text>
   );
 }
 
@@ -143,27 +159,33 @@ export default function TrackingsScreen({ navigation }) {
           />
         </Modal>
       </Portal>
-      <Text style={styles.helpText}>Swipe left to track</Text>
-      <FlatList
-        style={styles.listContainer}
-        data={trackingsCtx.trackings}
-        refreshControl={
-            <RefreshControl
-              refreshing={trackingsCtx.refreshing}
-              onRefresh={trackingsCtx.refreshTrackings}
-            />
-          }
-        keyExtractor={(item) => item.trackingId}
-        renderItem={({ item }) => (
-          <TrackingListItemSwipeable
-            onSwipeRight={handleTracking}
-            item={item}
+      {trackingsCtx.trackings.length === 0 ? (
+        <NoTrackingsView />
+      ) : (
+        <>
+          <Text style={styles.helpText}>Swipe left to track</Text>
+          <FlatList
+            style={styles.listContainer}
+            data={trackingsCtx.trackings}
+            refreshControl={
+              <RefreshControl
+                refreshing={trackingsCtx.refreshing}
+                onRefresh={trackingsCtx.refreshTrackings}
+              />
+            }
+            keyExtractor={(item) => item.trackingId}
+            renderItem={({ item }) => (
+              <TrackingListItemSwipeable
+                onSwipeRight={handleTracking}
+                item={item}
+              />
+            )}
+            ItemSeparatorComponent={() => <Divider />}
+            onEndReachedThreshold={0.2}
+            onEndReached={trackingsCtx.loadMoreTrackings}
           />
-        )}
-        ItemSeparatorComponent={() => <Divider />}
-        onEndReachedThreshold={0.2}
-        onEndReached={trackingsCtx.loadMoreTrackings}
-      />
+        </>
+      )}
       <Snackbar
         visible={snackbarMessage !== ""}
         onDismiss={hideSnackbar}
@@ -195,6 +217,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#999",
     marginTop: 5,
+  },
+  noTrackingsText: {
+    fontSize: 20,
+    color: "#999",
+    marginTop: 20,
+    marginHorizontal: 20,
+    textAlign: "center",
   },
   swipeableActionsContainer: {
     width: 100,

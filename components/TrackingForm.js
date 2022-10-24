@@ -127,7 +127,7 @@ export default function TrackingForm({
             Called my mom
           </Text>
           <Text style={[styles.exampleInfo, { color: colors.softText1 }]}>
-            Drank my pill
+            Drink my pill
           </Text>
         </View>
       )}
