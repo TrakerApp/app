@@ -68,6 +68,7 @@ export default function TrackingForm({
       <Text style={styles.title}>{title}</Text>
       <TextInput
         ref={nameInputRef}
+        maxLength={42}
         mode="outlined"
         disabled={loading}
         error={nameHasError}

@@ -13,7 +13,7 @@ export default function PreferencesContextProvider({ children }) {
 
   const loadPreferences = async () => {
     const theme = await AsyncStorage.getItem('theme');
-    console.log("loading prefs! theme:", theme)
+
     if (theme) {
       setIsThemeDark(theme === 'dark');
     }

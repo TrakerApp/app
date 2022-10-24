@@ -24,6 +24,7 @@ export function AuthEmailInput({
       mode="outlined"
       error={error}
       label="Email"
+      maxLength={50}
       left={<TextInput.Icon name="at" />}
       placeholder="john@gmail.com"
       style={style}
@@ -61,6 +62,7 @@ export function AuthPasswordInput({
       error={error}
       label={label}
       style={style}
+      maxLength={50}
       left={<TextInput.Icon name="form-textbox-password" />}
       onChangeText={(text) => setValue("password", text)}
       right={<TextInput.Icon name="eye" onPress={handleEyePress} />}
@@ -94,6 +96,7 @@ export function AuthCodeInput({
       keyboardType="number-pad"
       textContentType="oneTimeCode"
       mode="outlined"
+      maxLength={6}
       error={error}
       label={label}
       style={style}
