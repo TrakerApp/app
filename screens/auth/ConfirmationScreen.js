@@ -90,7 +90,7 @@ export default function ConfirmationScreen({ navigation, route }) {
             successMessage: "Thanks for confirming, please sign in.",
           });
         }
-      }, 3_000);
+      }, 3000);
     }
     console.log("confirmation res:", res);
     setLoading(false);
