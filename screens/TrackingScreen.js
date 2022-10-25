@@ -171,8 +171,6 @@ export default function TrackingScreen({ navigation, route }) {
 
   // setting initial values before loading
   useLayoutEffect(() => {
-    setLoading(true);
-    setRefreshing(true);
     // real data is loaded below after "loading"
     setTracking({
       trackingId,
