@@ -19,7 +19,6 @@ const DARK_COLORS = {
 	refreshIndicator: "#fff",
 }
 
-
 export default useColors = () => {
 	const { isThemeDark } = useContext(PreferencesContext);
 	const colors = isThemeDark ? DARK_COLORS : LIGHT_COLORS
