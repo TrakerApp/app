@@ -12,7 +12,8 @@ export default function AuthenticatedNavigator() {
 
   return (
     <Drawer.Navigator drawerContent={() => <DrawerContent />} screenOptions={{
-      headerTintColor: colors.softText1
+      headerTintColor: colors.softText1,
+      headerTitleAlign: "center"
     }}>
       <Drawer.Screen name="Your Trackings" component={TrackingsScreen} />
       <Drawer.Screen name="Tracking" component={TrackingScreen} />
