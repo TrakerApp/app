@@ -8,6 +8,7 @@ const LIGHT_COLORS = {
 	normalBorder: "#c8c8c8",
 	modalBackground: "white",
 	refreshIndicator: "#999",
+	link: "#0e57f4",
 }
 
 const DARK_COLORS = {
@@ -17,6 +18,7 @@ const DARK_COLORS = {
 	modalBackground: "#333",
 	normalBorder: "#313131",
 	refreshIndicator: "#fff",
+	link: "#7dabff",
 }
 
 export default useColors = () => {

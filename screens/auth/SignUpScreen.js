@@ -1,19 +1,27 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Linking } from "react-native";
 import { Button, Text } from "react-native-paper";
 import Title from "../../components/ui/Title";
 import { signUp } from "../../util/auth";
 import { AuthEmailInput, AuthPasswordInput } from "./AuthInputs";
 import { useAuthErrorHook } from "./useAuthErrorHook";
+import { Checkbox } from "react-native-paper";
+import useColors from "../../util/hooks/useColors";
+
+const EULA_URL = "https://traker-public-terms.s3.amazonaws.com/EULA.pdf";
+const PRIVACY_POLICY_URL = "https://traker-public-terms.s3.amazonaws.com/Privacy.pdf";
 
 export default function SignUpScreen({ navigation }) {
   const [loading, setLoading] = useState(false);
-  const [setError, AuthErrorComponent] = useAuthErrorHook()
+  const [setError, AuthErrorComponent] = useAuthErrorHook();
+  const [checked, setChecked] = useState(false);
+  const colors = useColors();
 
   const {
     register,
     setValue,
+    getValues,
     handleSubmit,
     formState: { errors },
   } = useForm({
@@ -66,7 +74,36 @@ export default function SignUpScreen({ navigation }) {
           register={register}
         />
 
-       <AuthErrorComponent/>
+        <View style={styles.checkboxContainer}>
+          <Checkbox.Android
+            status={checked ? "checked" : "unchecked"}
+            color={colors.softText1}
+            uncheckedColor={colors.softText1}
+            onPress={() => {
+              setChecked(!checked);
+            }}
+          />
+          <Text style={[styles.checkboxLabel, { color: colors.softText1 }]}>
+            I have read and accept the
+            <Text
+              style={{ color: colors.link }}
+              onPress={() => Linking.openURL(EULA_URL)}
+            >
+              {" "}
+              EULA
+            </Text>
+            <Text> and the</Text>
+            <Text
+              style={{ color: colors.link }}
+              onPress={() => Linking.openURL(PRIVACY_POLICY_URL)}
+            >
+              {" "}
+              Privacy Policy.
+            </Text>
+          </Text>
+        </View>
+
+        <AuthErrorComponent />
 
         <Button
           style={styles.outlinedButton}
@@ -105,6 +142,15 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     paddingTop: 20,
+  },
+  checkboxContainer: {
+    flexDirection: "row",
+    marginTop: 10,
+  },
+  checkboxLabel: {
+    fontSize: 16,
+    marginLeft: 5,
+    marginRight: 30,
   },
   input: {
     marginTop: 10,

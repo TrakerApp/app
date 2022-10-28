@@ -97,7 +97,7 @@ export const extractUser = (data) => {
   };
 };
 
-export const signUp = async (email, password) => {
+export const signUp = async (email, password, accepts_tos) => {
   try {
     return await Auth.signUp({
       username: email.toLowerCase(),
@@ -107,6 +107,7 @@ export const signUp = async (email, password) => {
         // phone_number, // optional - E.164 number convention
         // other custom attributes
         "custom:plan_name": "beta",
+        "custom:accepts_tos": accepts_tos,
       },
       autoSignIn: {
         // optional - enables auto sign in after user is confirmed
