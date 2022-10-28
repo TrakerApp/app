@@ -21,7 +21,6 @@ export default function SignUpScreen({ navigation }) {
   const {
     register,
     setValue,
-    getValues,
     handleSubmit,
     formState: { errors },
   } = useForm({
@@ -36,7 +35,13 @@ export default function SignUpScreen({ navigation }) {
     setLoading(true);
     setError("");
 
-    const res = await signUp(data.email, data.password);
+    if (!checked) {
+      setError("MustAcceptTos");
+      setLoading(false);
+      return
+    }
+
+    const res = await signUp(data.email, data.password, checked);
 
     if (res.error) {
       setError(res.error);

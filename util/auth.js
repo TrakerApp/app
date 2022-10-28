@@ -107,7 +107,7 @@ export const signUp = async (email, password, accepts_tos) => {
         // phone_number, // optional - E.164 number convention
         // other custom attributes
         "custom:plan_name": "beta",
-        "custom:accepts_tos": accepts_tos,
+        "custom:accepts_tos": `${accepts_tos}`,
       },
       autoSignIn: {
         // optional - enables auto sign in after user is confirmed

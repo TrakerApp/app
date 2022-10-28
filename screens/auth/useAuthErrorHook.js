@@ -24,6 +24,7 @@ const errorMessages = {
   UserDoesNotExist: "Email or password is incorrect.",
   IncorrectCredentials: "Email or password is incorrect.",
   InvalidEmailFormat: "The email you entered is not valid.",
+  MustAcceptTos: "Please accept the terms and conditions to continue",
 };
 
 const AuthErrorText = (error) => {
