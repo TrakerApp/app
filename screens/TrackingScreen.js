@@ -78,10 +78,10 @@ function removeOccurrenceAlert({ occurrence, onRemove }) {
   );
 }
 
-function removeTrackingAlert({ tracking, onRemove }) {
+function removeTrackingAlert({ onRemove }) {
   return Alert.alert(
     "Remove Tracking",
-    `Are you sure you want to delete "${tracking?.name}"? All the occurrences will be removed as well, and it's not recoverable.`,
+    `Are you sure you want to delete this tracking? All the occurrences will be removed as well, and it's not recoverable.`,
     [
       {
         text: "Yes, remove",
@@ -318,7 +318,6 @@ export default function TrackingScreen({ navigation, route }) {
 
   const handleRemoveTracking = async () => {
     removeTrackingAlert({
-      tracking,
       onRemove: removeTracking,
     });
   };
