@@ -392,7 +392,7 @@ export default function TrackingScreen({ navigation, route }) {
           </Text>
         </View>
         <View>
-          <Text style={[styles.infoTitle, styles.info]}>This week</Text>
+          <Text style={[styles.infoTitle, styles.info]}>Last 7 days</Text>
           <Text style={styles.info}>
             {getPluralSingular(tracking.weekOccurrences, "time", "times")}
           </Text>
